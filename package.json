@@ -3,14 +3,14 @@
   "version": "0.0.1",
   "description": "A webapp to encrypt for the future using drand",
   "scripts": {
-    "build": "parcel build",
+    "build": "parcel build ./src/index.html",
+    "build:ci": "npm run build && npm run lint && npm run check && npm run test",
     "check": "tsc --noEmit",
-    "ci": "npm run build && npm run lint && npm run check && npm run test",
     "clean": "rm -rf ./dist/*",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "start": "parcel ./src/index.html",
-    "test": "./node_modules/.bin/mocha --compilers ts:ts-node/register ./test/*.test.ts"
+    "test": "mocha --require ts-node/register ./test/*.test.ts"
   },
   "author": "drand.love",
   "license": "(Apache-2.0 OR MIT)",
