@@ -21,18 +21,14 @@ export async function encrypt(master: PointG1, ID: Uint8Array, msg: Uint8Array) 
     //const U = bls.PointG1.BASE G1().Point().Mul(r, s.G1().Point().Base())
 
 	// // 5. Compute V = sigma XOR H2(rGid)
-	// rGid := Gid.Mul(r, Gid) // even in Gt, it's additive notation
+	const rGid = Gid.multiply(r); // even in Gt, it's additive notation
 	// hrGid, err := gtToHash(rGid, len(msg), H2Tag())
-	// if err != nil {
-	// 	return nil, err
-	// }
+
 	// V := xor(sigma, hrGid)
 
 	// // 6. Compute M XOR H(sigma)
 	// hsigma, err := h4(sigma, len(msg))
-	// if err != nil {
-	// 	return nil, err
-	// }
+
 	// W := xor(msg, hsigma)
 
 	// return &Ciphertext{
@@ -43,6 +39,21 @@ export async function encrypt(master: PointG1, ID: Uint8Array, msg: Uint8Array) 
 
 }
 
+
+function xor(a: Uint8Array, b: Uint8Array) {
+	if (a.length != b.length) {
+		console.log("Error: xor only works on matching size");
+		return;
+	}
+
+	let ret = new Uint8Array(a.length);
+
+    for (let i = 0; i < a.length; i++) {
+		ret[i] = a[i]^b[i];
+	}
+
+	return ret;
+}
 
 const maxSize = 1 << 10;
 
@@ -56,6 +67,6 @@ function h3(sigma: Uint8Array, msg: Uint8Array) {
     .update(msg)
     .digest();
 
-    //PointG1.BASE.multiply
+    //return PointG1.BASE.multiply()
 	//return s.G1().Scalar().Pick(random.New(h3)), nil
 }
