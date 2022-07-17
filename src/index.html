@@ -1,11 +1,33 @@
 <!doctype html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8"/>
     <title>deadman encryption</title>
-    <script src="index.ts"></script>
-  </head>
-  <body>
-    <h1>Hello, World!</h1>
-  </body>
+    <link rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<h1>Enter text to encrypt</h1>
+
+<div id="container">
+    <div>
+        <button id="encrypt-button">Encrypt!</button>
+        <p id="error"></p>
+    </div>
+    <div>
+        <label for="plaintext">Plaintext</label>
+        <textarea id="plaintext"></textarea>
+        <label for="time">Decryption time</label>
+        <input
+                id="time"
+                type="datetime-local"
+        />
+    </div>
+    <div>
+        <label for="ciphertext">Ciphertext</label>
+        <textarea id="ciphertext"></textarea>
+    </div>
+</div>
+
+<script src="index.ts" type="module"></script>
+</body>
 </html>
