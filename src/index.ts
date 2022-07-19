@@ -1,4 +1,4 @@
-import * as yup from "yup"
+import {CompletedWebForm, encryptedOrDecryptedFormData} from "./controller"
 
 const plaintextElement = document.getElementById("plaintext") as HTMLTextAreaElement
 const ciphertextElement = document.getElementById("ciphertext") as HTMLTextAreaElement
@@ -6,24 +6,39 @@ const timeElement = document.getElementById("time") as HTMLInputElement
 const encryptButton = document.getElementById("encrypt-button") as HTMLButtonElement
 const errorMessage = document.getElementById("error") as HTMLParagraphElement
 
-encryptButton.addEventListener("click", async _ => {
+document.addEventListener("DOMContentLoaded", () => {
+    const now = new Date(Date.now())
+
+    // trim off seconds and milliseconds as drand isn't _quite_ accurate enough with a 30s frequency
+    now.setSeconds(0)
+    now.setMilliseconds(0)
+
+    timeElement.valueAsDate = now
+})
+
+encryptButton.addEventListener("click", async () => {
     try {
-        const dataToEncrypt = await encryptionForm.validate({
-            plaintext: plaintextElement.value,
-            time: timeElement.value
-        })
-        ciphertextElement.value = await tle(dataToEncrypt.plaintext, dataToEncrypt.time)
+        render(await encryptedOrDecryptedFormData(formAsObject()))
     } catch (e: unknown) {
-        console.error(e)
-        errorMessage.innerText = (e as Error).message
+        renderError(e as Error)
     }
 })
 
-const encryptionForm = yup.object().shape({
-    plaintext: yup.string().required(),
-    time: yup.date().required()
-}).required()
+function formAsObject() {
+    return {
+        plaintext: plaintextElement.value,
+        ciphertext: ciphertextElement.value,
+        decryptionTime: timeElement.valueAsDate?.getTime(),
+    }
+}
 
-function tle(data: string, decryptionTime: number): Promise<string> {
-    return Promise.resolve(Buffer.from(data + decryptionTime).toString("base64"))
+function render(output: CompletedWebForm) {
+    output.plaintext && (plaintextElement.value = output.plaintext)
+    output.ciphertext && (ciphertextElement.value = output.ciphertext)
+    timeElement.valueAsDate = new Date(output.decryptionTime)
+}
+
+function renderError(error: Error) {
+    console.error(error)
+    errorMessage.innerText = error.message
 }
