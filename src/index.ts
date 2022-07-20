@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 encryptButton.addEventListener("click", async () => {
     try {
+        clearErrors()
         render(await encryptedOrDecryptedFormData(formAsObject()))
     } catch (e: unknown) {
         renderError(e as Error)
@@ -41,4 +42,8 @@ function render(output: CompletedWebForm) {
 function renderError(error: Error) {
     console.error(error)
     errorMessage.innerText = error.message
+}
+
+function clearErrors() {
+    errorMessage.innerText = ""
 }
