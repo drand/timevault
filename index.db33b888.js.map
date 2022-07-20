@@ -1,0 +1,1 @@
+{"mappings":"AAAAA,QAAQC,IAAI","sources":["src/index.ts"],"sourcesContent":["console.log(\"Hello from typescript\")\n"],"names":["console","log"],"version":3,"file":"index.db33b888.js.map"}
