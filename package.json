@@ -4,6 +4,7 @@
   "description": "A webapp to encrypt for the future using drand",
   "scripts": {
     "build": "parcel build ./src/index.html",
+    "build:githubpages": "parcel build ./src/index.html --public-url https://drand.github.io/postcrypt",
     "build:ci": "npm run build && npm run lint && npm run check && npm run test",
     "check": "tsc --noEmit",
     "clean": "rm -rf ./dist/*",
