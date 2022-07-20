@@ -1,0 +1,45 @@
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+#container {
+    height: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2em;
+}
+
+#controls {
+    width: 100%;
+    display: flex;
+}
+
+#errors {
+    width: 100%;
+    height: 3em;
+    color: red;
+    text-align: center;
+}
+
+#text-areas {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+#text-areas > * {
+    width: 50%;
+    padding: 1em;
+}
+
+#text-areas > * > textarea {
+    height: 100%;
+}

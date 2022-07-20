@@ -1,6 +1,6 @@
-# Postcrypt
+# ️Postcrypt ✉ 🪦
 
-A deadman's switch to encrypt your vulnerability reports or other compromising data to be decryptable at aset time in the future.  Powered by [drand](https://drand.love).
+A deadman's switch to encrypt your vulnerability reports or other compromising data to be decryptable at a set time in the future.  Powered by [drand](https://drand.love).
 
 ## Prerequisites
 - node 16+
