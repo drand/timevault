@@ -10,10 +10,32 @@ jobs:
   build_and_test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Checkout 🛎️
+        uses: actions/checkout@v3
+
+      - name: Install nodejs 🔧
+        uses: actions/setup-node@v3
         with:
           node-version: latest
-      - run: npm ci
-      - run: npm run build:ci
+
+      - name: Build and test app 🔧
+        run: |
+          npm ci
+          npm run build:ci
+  deploy_to_github_pages:
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v3
+
+      - name: Install and Build 🔧
+        run: |
+          npm ci
+          npm run build
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: dist
 
