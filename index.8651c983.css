@@ -1,0 +1,2 @@
+html,body{width:100%;height:100%;margin:0 auto}.input-group{flex-direction:column;display:flex}#container{height:90%;flex-direction:column;align-items:center;padding:2em;display:flex}#controls{width:100%;display:flex}#errors{width:100%;height:3em;color:red;text-align:center}#text-areas{width:100%;height:100%;display:flex}#text-areas>*{width:50%;padding:1em}#text-areas>*>textarea{height:100%}
+/*# sourceMappingURL=index.8651c983.css.map */
