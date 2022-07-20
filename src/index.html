@@ -3,28 +3,36 @@
 <head>
     <meta charset="utf-8"/>
     <title>deadman encryption</title>
-    <link rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" type="text/css" href="./index.css"/>
 </head>
 <body>
-<h1>Enter text to encrypt</h1>
 
 <div id="container">
-    <div>
-        <button id="encrypt-button">Encrypt/decrypt!</button>
-        <p id="error"></p>
+    <h1>Enter text to encrypt/decrypt</h1>
+    <div id="controls">
+        <div>
+            <label for="time">Decryption time</label>
+            <input
+                    id="time"
+                    type="datetime-local"
+            />
+        </div>
+        <div id="errors">
+            <p id="error"></p>
+        </div>
+        <div>
+            <button id="encrypt-button">Encrypt/decrypt!</button>
+        </div>
     </div>
-    <div>
-        <label for="plaintext">Plaintext</label>
-        <textarea id="plaintext"></textarea>
-        <label for="time">Decryption time</label>
-        <input
-                id="time"
-                type="datetime-local"
-        />
-    </div>
-    <div>
-        <label for="ciphertext">Ciphertext</label>
-        <textarea id="ciphertext"></textarea>
+    <div id="text-areas">
+        <div class="input-group">
+            <label for="plaintext">Plaintext</label>
+            <textarea id="plaintext"></textarea>
+        </div>
+        <div class="input-group">
+            <label for="ciphertext">Ciphertext</label>
+            <textarea id="ciphertext"></textarea>
+        </div>
     </div>
 </div>
 
