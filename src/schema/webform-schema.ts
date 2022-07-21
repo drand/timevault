@@ -9,5 +9,4 @@ const webFormSchema = yup.object({
         .required()
 }).required()
 
-export type CompletedWebForm = yup.InferType<typeof webFormSchema>
-export { webFormSchema}
+export { webFormSchema }

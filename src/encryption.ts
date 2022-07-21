@@ -1,4 +1,7 @@
-import {CompletedWebForm, webFormSchema} from "./schema/webform-schema"
+import * as yup from "yup"
+import {webFormSchema} from "./schema/webform-schema"
+
+export type CompletedWebForm = yup.InferType<typeof webFormSchema>
 
 export async function encryptedOrDecryptedFormData(form: unknown): Promise<CompletedWebForm> {
     const partialWebForm = await webFormSchema.validate(form)
@@ -28,3 +31,4 @@ function decrypt(ciphertext: string, decryptionTime: number): Promise<CompletedW
         ciphertext,
     })
 }
+
