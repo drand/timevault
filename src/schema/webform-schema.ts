@@ -2,7 +2,7 @@ import * as yup from "yup"
 
 const webFormSchema = yup.object({
     plaintext: yup.string().nullable(true).optional(),
-    ciphertext: yup.string().nullable(true).optional(), // should really limit to base64 + armor header/footer
+    ciphertext: yup.string().nullable(true).optional(),
     decryptionTime: yup.number()
         .positive()
         .moreThan(Date.now(), "Decryption time must be in the future!")
