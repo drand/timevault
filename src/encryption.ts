@@ -1,5 +1,6 @@
 import * as yup from "yup"
 import {webFormSchema} from "./schema/webform-schema"
+import {DrandHttpClient} from "./drand/drand-client";
 
 export type CompletedWebForm = yup.InferType<typeof webFormSchema>
 
@@ -17,10 +18,12 @@ export async function encryptedOrDecryptedFormData(form: unknown): Promise<Compl
 }
 
 async function encrypt(plaintext: string, decryptionTime: number): Promise<CompletedWebForm> {
+    const drandClient = DrandHttpClient.createFetchClient()
+    const {randomness} = await drandClient.getLatest()
     return Promise.resolve({
         plaintext,
         decryptionTime,
-        ciphertext: Buffer.from(plaintext + decryptionTime).toString("base64")
+        ciphertext: Buffer.from(plaintext + decryptionTime + randomness).toString("base64")
     })
 }
 
