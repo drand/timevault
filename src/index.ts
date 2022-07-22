@@ -7,13 +7,7 @@ const encryptButton = document.getElementById("encrypt-button") as HTMLButtonEle
 const errorMessage = document.getElementById("error") as HTMLParagraphElement
 
 document.addEventListener("DOMContentLoaded", () => {
-    const now = new Date(Date.now())
-
-    // trim off seconds and milliseconds as drand isn't _quite_ accurate enough with a 30s frequency
-    now.setSeconds(0)
-    now.setMilliseconds(0)
-
-    timeElement.valueAsDate = now
+    renderDecryptionTime(Date.now())
 })
 
 encryptButton.addEventListener("click", async () => {
@@ -29,19 +23,31 @@ function formAsObject() {
     return {
         plaintext: plaintextElement.value,
         ciphertext: ciphertextElement.value,
-        decryptionTime: timeElement.valueAsDate?.getTime(),
+        decryptionTime: timeElement.valueAsNumber,
     }
 }
 
 function render(output: CompletedWebForm) {
-    output.plaintext && (plaintextElement.value = output.plaintext)
-    output.ciphertext && (ciphertextElement.value = output.ciphertext)
-    timeElement.valueAsDate = new Date(output.decryptionTime)
+    if (output.plaintext) {
+        plaintextElement.value = output.plaintext
+    }
+    if (output.ciphertext) {
+        ciphertextElement.value = output.ciphertext
+    }
+    renderDecryptionTime(output.decryptionTime)
 }
 
 function renderError(error: Error) {
     console.error(error)
     errorMessage.innerText = error.message
+}
+
+function renderDecryptionTime(time: number) {
+    const wrappedTime = new Date(time)
+    wrappedTime.setSeconds(0)
+    wrappedTime.setMilliseconds(0)
+    // neither `value` nor `valueAsDate` work in both chrome _and_ firefox... nice
+    timeElement.valueAsNumber = wrappedTime.getTime()
 }
 
 function clearErrors() {
