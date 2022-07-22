@@ -11,12 +11,13 @@
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "start": "parcel ./src/index.html",
-    "test": "mocha --require ts-node/register ./test/*.test.ts"
+    "test": "mocha --require ts-node/register ./test/**/*.test.ts"
   },
   "author": "drand.love",
   "license": "(Apache-2.0 OR MIT)",
   "devDependencies": {
     "@types/chai": "^4.3.1",
+    "@types/chai-as-promised": "^7.1.5",
     "@types/mocha": "^9.1.1",
     "@types/node": "^18.0.4",
     "@types/yup": "^0.29.14",
@@ -24,6 +25,7 @@
     "@typescript-eslint/parser": "^5.30.6",
     "buffer": "^6.0.3",
     "chai": "^4.3.6",
+    "chai-as-promised": "^7.1.1",
     "eslint": "^8.19.0",
     "mocha": "^10.0.0",
     "parcel": "^2.6.2",
@@ -39,6 +41,7 @@
     "node": ">= 16.0.0"
   },
   "dependencies": {
+    "@noble/bls12-381": "^1.2.0",
     "yup": "^0.32.11"
   }
 }
