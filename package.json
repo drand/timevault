@@ -18,6 +18,7 @@
   "devDependencies": {
     "@types/chai": "^4.3.1",
     "@types/chai-as-promised": "^7.1.5",
+    "@types/chai-string": "^1.4.2",
     "@types/mocha": "^9.1.1",
     "@types/node": "^18.0.4",
     "@types/yup": "^0.29.14",
@@ -26,6 +27,7 @@
     "buffer": "^6.0.3",
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
+    "chai-string": "^1.5.0",
     "eslint": "^8.19.0",
     "mocha": "^10.0.0",
     "parcel": "^2.6.2",
@@ -42,6 +44,7 @@
   },
   "dependencies": {
     "@noble/bls12-381": "^1.2.0",
+    "@noble/hashes": "^1.1.2",
     "yup": "^0.32.11"
   }
 }
