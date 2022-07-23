@@ -10,46 +10,51 @@ type Stanza = {
 }
 
 type ArmorConfig = {
+    encodingTitleText: string
     introText: string,
     macMessage: string,
     maxColumns: number
 }
 
 const ageArmorConfig = {
+    encodingTitleText: "AGE ENCRYPTED",
     introText: "age-encryption.org/v1",
     macMessage: "header",
     maxColumns: 64,
 }
 
 function encodeArmor(
-    type: string,
     fileKey: Uint8Array,
     recipients: Array<Stanza> = [],
     config: ArmorConfig = ageArmorConfig,
 ): string {
-    if (type.trim().length === 0) {
-        throw new Error("Armor encoding type cannot be empty")
-    }
-
-    return header(type) + `${config.introText}\n` + stanzas(recipients) + mac(fileKey, config.macMessage) + encodedPayload(fileKey, config) + footer(type)
+    return header(config) +
+        `${config.introText}\n` +
+        stanzas(recipients, config) +
+        mac(fileKey, config.macMessage) +
+        encodedPayload(fileKey, config) +
+        footer(config.encodingTitleText)
 }
 
-function header(type: string): string {
-    return `-----BEGIN ${type.toUpperCase()} FILE-----\n`
+function header(config: ArmorConfig): string {
+    if (config.encodingTitleText.trim().length === 0) {
+        throw new Error("Armor encoding type cannot be empty")
+    }
+    return `-----BEGIN ${config.encodingTitleText.toUpperCase()} FILE-----\n`
 }
 
 function footer(type: string): string {
     return `-----END ${type.toUpperCase()} FILE-----\n`
 }
 
-function stanzas(recipients: Array<Stanza>): string {
-    return recipients.map(it => stanza(it)).join()
+function stanzas(recipients: Array<Stanza>, config: ArmorConfig): string {
+    return recipients.map(it => stanza(it, config)).join("")
 }
 
-function stanza(recipient: Stanza): string {
+function stanza(recipient: Stanza, config: ArmorConfig): string {
     const args = recipient.args.join(" ")
-    const body = Buffer.from(recipient.body).toString("base64")
-    return `-> ${recipient.type} ${args} ${body}\n`
+    const body = chunked(Buffer.from(recipient.body).toString("base64"), config.maxColumns)
+    return `-> ${recipient.type} ${args}\n ${body}\n`
 }
 
 function mac(key: Uint8Array, message: string): string {
@@ -69,7 +74,7 @@ function encodedPayload(payload: Uint8Array, config: ArmorConfig) {
     e.g. chunked("hello world", 2, ".") returns
     ["he.", "ll.", "o .", "wo.", "rl.", "d."]
  */
-function chunked(input: string, chunkSize: number, suffix?: string): Array<string> {
+function chunked(input: string, chunkSize: number, suffix = ""): Array<string> {
     const output = []
     let currentChunk = ""
     for (let i = 0, chunks = 0; i < input.length; i++) {

@@ -16,7 +16,7 @@ describe("armor", () => {
             ],
             body: new Uint8Array(Buffer.from("some cool timelock ciphertext")), // encrypted payload
         }
-        const armor = encodeArmor("AGE ENCRYPTED", helloWorld, [someRecipient])
+        const armor = encodeArmor(helloWorld, [someRecipient])
 
         it("should contain the correct header", () => {
             expect(armor).to.startWith("-----BEGIN AGE ENCRYPTED FILE-----")
@@ -38,14 +38,44 @@ describe("armor", () => {
         })
 
         it("should have multiple newlines for longer payloads", () => {
+            // five hello worlds encode to a string longer than the default 64 column limit
             const fiveHelloWorlds = new Uint8Array(Buffer.from("hello world".repeat(5)))
-            const armor = encodeArmor("AGE ENCRYPTED", fiveHelloWorlds)
-            // newline for header, intro, mac, footer, and two for the longer payload
+            const armor = encodeArmor(fiveHelloWorlds)
+            // newline for header, intro, mac, footer and two for the longer payload = 6
             expect(Array.from(armor.matchAll(/\n/g))).to.have.length(6)
         })
 
         it("should have an additional line for each recipient", () => {
+            const recipients = [{
+                type: "tlock",
+                args: ["0", "abc"],
+                body: helloWorld
+            }, {
+                type: "other-stuff",
+                args: ["0", "abc"],
+                body: helloWorld
+            }]
 
+            const armor = encodeArmor(helloWorld, recipients)
+            // newline for header, intro, mac, footer and payload = 5
+            // additionally 4 more lines for recipients:
+            // per recipient 1 for type and args, 1 for the payload
+            expect(Array.from(armor.matchAll(/\n/g))).to.have.length(9)
+        })
+        
+        it("recipients with long payloads have extra \n for each `maxColumns` characters", () => {
+            // five hello worlds encode to a string longer than the default 64 column limit
+            const fiveHelloWorlds = new Uint8Array(Buffer.from("hello world".repeat(5)))
+            const recipients = [{
+                type: "tlock",
+                args: ["0", "abc"],
+                body: fiveHelloWorlds
+            }]
+
+            const armor = encodeArmor(helloWorld, recipients)
+            // newline for header, intro, mac, footer and payload = 5
+            // the recipient takes up 3 lines this time: 1 for type + args, and 2 for the larger payload
+            expect(Array.from(armor.matchAll(/\n/g))).to.have.length(7)
         })
     })
 })
