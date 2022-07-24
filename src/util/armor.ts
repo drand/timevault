@@ -48,7 +48,7 @@ function suffix(type: string): string {
 
 function header(fileKey: Uint8Array, recipients: Array<Stanza>, config: ArmorConfig) {
     const recipientStanzas = stanzas(recipients, config)
-    const headerText = `${config.introText}\n${recipientStanzas}---`
+    const headerText = `${config.introText}\n${recipientStanzas}\n---`
     const someHkdf = hkdf(sha256, fileKey, "", config.macMessage, sha256.outputLen)
     const hmacText = Buffer.from(hmac(sha256, someHkdf, headerText)).toString("base64")
 
@@ -56,13 +56,13 @@ function header(fileKey: Uint8Array, recipients: Array<Stanza>, config: ArmorCon
 }
 
 function stanzas(recipients: Array<Stanza>, config: ArmorConfig): string {
-    return recipients.map(it => stanza(it, config)).join("")
+    return recipients.map(it => stanza(it, config)).join("\n")
 }
 
 function stanza(recipient: Stanza, config: ArmorConfig): string {
     const args = recipient.args.join(" ")
     const body = chunked(Buffer.from(recipient.body).toString("base64"), config.maxColumns)
-    return `-> ${recipient.type} ${args}\n ${body}\n`
+    return `-> ${recipient.type} ${args}\n ${body}`
 }
 
 function encodedPayload(payload: Uint8Array, config: ArmorConfig) {

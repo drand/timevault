@@ -73,7 +73,6 @@ describe("armor", () => {
             }]
 
             const armor = encodeArmor(helloWorld, recipients)
-            console.log(armor)
             // newline for header, intro, mac, footer and payload = 5
             // the recipient takes up 3 lines this time: 1 for type + args, and 2 for the larger payload
             expect(Array.from(armor.matchAll(/\n/g))).to.have.length(7)
