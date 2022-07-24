@@ -1,5 +1,6 @@
 import {sha256} from "@noble/hashes/sha256"
 import {hmac} from "@noble/hashes/hmac"
+import {hkdf} from "@noble/hashes/hkdf"
 
 // `Stanza` is a section of the age header that encapsulates the file key as
 // encrypted to a specific recipient.
@@ -28,23 +29,30 @@ function encodeArmor(
     recipients: Array<Stanza> = [],
     config: ArmorConfig = ageArmorConfig,
 ): string {
-    return header(config) +
-        `${config.introText}\n` +
-        stanzas(recipients, config) +
-        mac(fileKey, config.macMessage) +
-        encodedPayload(fileKey, config) +
-        footer(config.encodingTitleText)
+    return prefix(config) +
+    header(fileKey, recipients, config) +
+    encodedPayload(fileKey, config) +
+    suffix(config.encodingTitleText)
 }
 
-function header(config: ArmorConfig): string {
+function prefix(config: ArmorConfig): string {
     if (config.encodingTitleText.trim().length === 0) {
         throw new Error("Armor encoding type cannot be empty")
     }
     return `-----BEGIN ${config.encodingTitleText.toUpperCase()} FILE-----\n`
 }
 
-function footer(type: string): string {
+function suffix(type: string): string {
     return `-----END ${type.toUpperCase()} FILE-----\n`
+}
+
+function header(fileKey: Uint8Array, recipients: Array<Stanza>, config: ArmorConfig) {
+    const recipientStanzas = stanzas(recipients, config)
+    const headerText = `${config.introText}\n${recipientStanzas}---`
+    const someHkdf = hkdf(sha256, fileKey, "", config.macMessage, sha256.outputLen)
+    const hmacText = Buffer.from(hmac(sha256, someHkdf, headerText)).toString("base64")
+
+    return `${headerText} ${hmacText}\n`
 }
 
 function stanzas(recipients: Array<Stanza>, config: ArmorConfig): string {
@@ -55,11 +63,6 @@ function stanza(recipient: Stanza, config: ArmorConfig): string {
     const args = recipient.args.join(" ")
     const body = chunked(Buffer.from(recipient.body).toString("base64"), config.maxColumns)
     return `-> ${recipient.type} ${args}\n ${body}\n`
-}
-
-function mac(key: Uint8Array, message: string): string {
-    const macCipher = Buffer.from(hmac(sha256, key, message)).toString("base64")
-    return `--- ${macCipher}\n`
 }
 
 function encodedPayload(payload: Uint8Array, config: ArmorConfig) {
