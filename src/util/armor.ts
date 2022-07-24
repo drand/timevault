@@ -30,9 +30,9 @@ function encodeArmor(
     config: ArmorConfig = ageArmorConfig,
 ): string {
     return prefix(config) +
-    header(fileKey, recipients, config) +
-    encodedPayload(fileKey, config) +
-    suffix(config.encodingTitleText)
+        header(fileKey, recipients, config) +
+        encodedPayload(fileKey, config) +
+        suffix(config.encodingTitleText)
 }
 
 function prefix(config: ArmorConfig): string {
