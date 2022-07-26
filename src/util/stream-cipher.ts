@@ -2,7 +2,7 @@
 // STREAM cipher
 // https://eprint.iacr.org/2015/189.pdf
 // There are NO js libraries right now.
-// miscreant.js implements STREAM, but it doesn't support chacha
+// miscreant.js implements STREAM, but it doesn"t support chacha
 // https://github.com/miscreant/miscreant.js
 // TODO: browser version
 //
@@ -65,8 +65,8 @@ export class STREAM {
     }
 
     encryptChunk(chunk: ui8a, isLast: boolean, output: ui8a) {
-        if (chunk.length > CHUNK_SIZE) throw new Error('Chunk is too big')
-        if (this.nonce[11] === 1) throw new Error('Last chunk has been processed')
+        if (chunk.length > CHUNK_SIZE) throw new Error("Chunk is too big")
+        if (this.nonce[11] === 1) throw new Error("Last chunk has been processed")
         if (isLast) this.nonce[11] = 1
         const ciphertext = ChaCha20Poly1305.encrypt(this.key, chunk, this.nonce)
         output.set(ciphertext)
@@ -74,8 +74,8 @@ export class STREAM {
     }
 
     decryptChunk(chunk: ui8a, isLast: boolean, output: ui8a) {
-        if (chunk.length > ENCRYPTED_CHUNK_SIZE) throw new Error('Chunk is too big')
-        if (this.nonce[11] === 1) throw new Error('Last chunk has been processed')
+        if (chunk.length > ENCRYPTED_CHUNK_SIZE) throw new Error("Chunk is too big")
+        if (this.nonce[11] === 1) throw new Error("Last chunk has been processed")
         if (isLast) this.nonce[11] = 1
         const plaintext = ChaCha20Poly1305.decrypt(this.key, chunk, this.nonce)
         output.set(plaintext)
@@ -103,7 +103,7 @@ export class STREAM {
 }
 
 // ChaCha20-Poly1305 from RFC 7539.
-const CHACHA_NAME = 'chacha20-poly1305'
+const CHACHA_NAME = "chacha20-poly1305"
 const CNS = 12; // chacha nonce size
 export class ChaCha20Poly1305 {
     static encrypt(privateKey: ui8a, plaintext: ui8a, nonce: ui8a = new Uint8Array(CNS)): ui8a {
