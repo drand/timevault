@@ -58,7 +58,7 @@ export function decryptAge(
     const header = sliceUntil(payload, "---")
     const expectedMac = createMacKey(fileKey, hkdfHeaderMessage, header)
 
-    if (Buffer.compare(expectedMac, encryptedPayload.header.mac)) {
+    if (Buffer.compare(expectedMac, encryptedPayload.header.mac) !== 0) {
         throw Error("The MAC did not validate for the filekey and payload!")
     }
     return Buffer.from(STREAM.open(encryptedPayload.body, fileKey)).toString("utf8")
