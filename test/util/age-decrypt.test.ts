@@ -1,6 +1,6 @@
 import {expect} from "chai"
 import {decryptAge} from "../../src/util/age-decrypt"
-import {encryptAge} from "../../src/util/age-encrypt"
+import {encryptAge} from "../../src/util/age-encrypt-decrypt"
 
 describe("AGE decryption", () => {
     it("can decrypt something that has been encrypted", () => {

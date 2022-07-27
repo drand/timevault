@@ -1,7 +1,7 @@
 import * as chai from "chai"
 import {expect} from "chai"
 import chaiString from "chai-string"
-import {decryptAge, encryptAge} from "../../src/util/age-encrypt"
+import {decryptAge, encryptAge} from "../../src/util/age-encrypt-decrypt"
 import {constants} from "crypto";
 import defaultCoreCipherList = module
 

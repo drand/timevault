@@ -1,4 +1,4 @@
-import {Stanza} from "./age-encrypt";
+import {Stanza} from "./age-encrypt-decrypt";
 
 
 const noOpType = "no-op"
