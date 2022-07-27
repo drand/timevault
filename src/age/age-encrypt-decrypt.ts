@@ -1,8 +1,8 @@
 import {STREAM} from "./stream-cipher"
 import {random} from "./random"
 import {NoOpEncdec} from "./no-op-encdec"
-import {header, readAge, writeAge} from "./age-reader-writer"
-import {createMacKey} from "./hmac";
+import {readAge, writeAge} from "./age-reader-writer"
+import {createMacKey} from "./hmac"
 
 type FileKey = Uint8Array
 type EncryptionWrapper = (fileKey: FileKey) => Array<Stanza>
@@ -69,16 +69,16 @@ export function decryptAge(
 // returns the whole string if it's not found
 // e.g. sliceUntil("hello world", "ll") will return "hell"
 function sliceUntil(input: string, searchTerm: string) {
-    let endPointer = 0
+    let lettersMatched = 0
     for (let i = 0; i < input.length; ++i) {
-        if (endPointer === searchTerm.length - 1) {
-            return input.slice(0, i + 1)
+        if (lettersMatched === searchTerm.length) {
+            return input.slice(0, i)
         }
 
-        if (input[i] === searchTerm[endPointer]) {
-            ++endPointer
+        if (input[i] === searchTerm[lettersMatched]) {
+            ++lettersMatched
         } else {
-            endPointer = 0
+            lettersMatched = 0
         }
     }
 
