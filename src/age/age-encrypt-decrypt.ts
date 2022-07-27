@@ -1,7 +1,7 @@
 import {STREAM} from "./stream-cipher"
 import {random} from "./random"
 import {NoOpEncdec} from "./no-op-encdec"
-import {header, read, write} from "./age-reader-writer"
+import {header, readAge, writeAge} from "./age-reader-writer"
 import {createMacKey} from "./hmac";
 
 type FileKey = Uint8Array
@@ -34,7 +34,7 @@ export function encryptAge(
         body: encryptedPayload(fileKey, plaintext)
     }
 
-    return write(encryptionParams)
+    return writeAge(encryptionParams)
 }
 
 function encryptedPayload(fileKey: Uint8Array, payload: Uint8Array): Uint8Array {
@@ -48,7 +48,7 @@ export function decryptAge(
     payload: string,
     unwrapEncryption: DecryptionWrapper = NoOpEncdec.unwrap
 ): string {
-    const encryptedPayload = read(payload)
+    const encryptedPayload = readAge(payload)
     const version = encryptedPayload.header.version
     if (version !== ageVersion) {
         throw Error(`The payload version ${version} is not supported, only ${ageVersion}`)

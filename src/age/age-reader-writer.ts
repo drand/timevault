@@ -25,7 +25,7 @@ type AgeEncryptionOutput = {
 
 // takes the model to be encrypted and encodes everything to a string
 // inserting newlines other tags and the hmac as per the spec
-export function write(input: AgeEncryptionInput): string {
+export function writeAge(input: AgeEncryptionInput): string {
     const headerStr = header(input)
     const macKey = mac(createMacKey(input.fileKey, input.headerMacMessage, headerStr))
     return `${headerStr} ${macKey}\n${ciphertext(input.body)}`
@@ -40,11 +40,14 @@ export function header(input: AgeEncryptionInput): string {
 // parses an AGE encrypted string into a model object with all the
 // relevant parts encoded correctly
 // throws errors if things are missing or in the wrong place
-export function read(input: string): AgeEncryptionOutput {
+export function readAge(input: string): AgeEncryptionOutput {
     const [version, ...lines] = input.split("\n")
 
     const identities: Array<Stanza> = []
     let current = lines.shift()
+    if (!current) {
+        throw Error("Expected at least one stanza! (beginning with -->)")
+    }
 
     while (!!current && current.startsWith("-> ")) {
         const [type, ...args] = current.slice(3, current.length).split(" ")
@@ -57,11 +60,13 @@ export function read(input: string): AgeEncryptionOutput {
         current = lines.shift()
     }
 
-    if (!current) {
+    const macStartingTag = "--- "
+    if (!current || !current.startsWith(macStartingTag)) {
         throw Error("Expected mac, but there were no more lines left!")
     }
 
-    const mac = current.slice("--- ".length, current.length)
+    // mac cannot be validated yet, as we don't have the filekey
+    const mac = current.slice(macStartingTag.length, current.length)
     const ciphertext = lines.shift() ?? ""
 
     return {
