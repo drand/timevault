@@ -1,6 +1,4 @@
-import {hkdf} from "@noble/hashes/hkdf"
-import {hmac} from "@noble/hashes/hmac"
-import {sha256} from "@noble/hashes/sha256"
+import {createMacKey} from "./hmac"
 
 type Stanza = {
     type: string,
@@ -27,17 +25,22 @@ type AgeEncryptionOutput = {
 
 // takes the model to be encrypted and encodes everything to a string
 // inserting newlines other tags and the hmac as per the spec
-export const write = (input: AgeEncryptionInput): string => {
-    const header = `${input.version}\n${recipients(input.recipients)}`
-    const macKey = mac(createMacKey(input.fileKey, input.headerMacMessage, header))
+export function write(input: AgeEncryptionInput): string {
+    const headerStr = header(input)
+    const macKey = mac(createMacKey(input.fileKey, input.headerMacMessage, headerStr))
+    return `${headerStr} ${macKey}\n${ciphertext(input.body)}`
+}
 
-    return `${header}${macKey}\n${ciphertext(input.body)}`
+// ends with a `---`, as this is included in the header when
+// calculating the MAC
+export function header(input: AgeEncryptionInput): string {
+    return `${input.version}\n${recipients(input.recipients)}---`
 }
 
 // parses an AGE encrypted string into a model object with all the
 // relevant parts encoded correctly
 // throws errors if things are missing or in the wrong place
-export const read = (input: string): AgeEncryptionOutput => {
+export function read(input: string): AgeEncryptionOutput {
     const [version, ...lines] = input.split("\n")
 
     const identities: Array<Stanza> = []
@@ -54,7 +57,11 @@ export const read = (input: string): AgeEncryptionOutput => {
         current = lines.shift()
     }
 
-    const mac = current ?? ""
+    if (!current) {
+        throw Error("Expected mac, but there were no more lines left!")
+    }
+
+    const mac = current.slice("--- ".length, current.length)
     const ciphertext = lines.shift() ?? ""
 
     return {
@@ -78,13 +85,10 @@ const recipient = (stanza: Stanza) => {
     return `-> ${type} ${aggregatedArgs}\n${encodedBody}`
 }
 
-function createMacKey(fileKey: Uint8Array, macMessage: string, headerText: string): Uint8Array {
-    const hmacKey = hkdf(sha256, fileKey, "", macMessage, 32)
-    return Buffer.from(hmac(sha256, hmacKey, headerText))
-}
-
+// The `---` preceding is technically part
+// of the MAC-able text, but _not_ the space
 const mac = (macStr: Uint8Array) =>
-    `--- ${Buffer.from(macStr).toString("base64")}`
+    `${Buffer.from(macStr).toString("base64")}`
 
 const ciphertext = (body: Uint8Array) =>
     Buffer.from(body).toString("binary")

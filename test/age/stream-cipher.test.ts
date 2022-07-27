@@ -1,6 +1,6 @@
 import {test} from "mocha"
 import {expect} from "chai"
-import {STREAM} from "../../src/util/stream-cipher"
+import {STREAM} from "../../src/age/stream-cipher"
 
 test("encryption with stream cipher can be decrypted", () => {
     const plaintext = new Uint8Array(22).fill(2)

@@ -1,7 +1,7 @@
 import chai from "chai"
 import {expect} from "chai"
 import chaiString from "chai-string"
-import {armorify} from "../../src/util/armor"
+import {armorify} from "../../src/age/armor"
 
 chai.use(chaiString)
 
