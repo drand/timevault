@@ -1,7 +1,7 @@
-import {unpaddedBase64, unpaddedBase64Buffer} from "../../src/age/util";
 import * as chai from "chai"
 import chaiString from "chai-string"
 import {expect} from "chai"
+import {unpaddedBase64, unpaddedBase64Buffer} from "../../src/age/util"
 
 chai.use(chaiString)
 

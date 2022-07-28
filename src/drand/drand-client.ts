@@ -9,23 +9,38 @@ export interface DrandClient {
 export type Beacon = yup.InferType<typeof beaconSchema>
 
 // config for the testnet chain info
-export const defaultClientOptions: DrandClientOptions = {
+export const defaultClientInfo: DrandNetworkInfo = {
     chainUrl: "https://pl-us.testnet.drand.sh",
     chainHash: "7672797f548f3f4748ac4bf3352fc6c6b6468c9ad40ad456a397545c6e2df5bf",
-    publicKey: "8200fc249deb0148eb918d6e213980c5d01acd7fc251900d9260136da3b54836ce125172399ddc69c4e3e11429b62c11"
+    publicKey: "8200fc249deb0148eb918d6e213980c5d01acd7fc251900d9260136da3b54836ce125172399ddc69c4e3e11429b62c11",
+    genesisTime: 1651677099,
+    period: 3,
+    schemeID: "pedersen-bls-unchained"
 }
-export type DrandClientOptions = {
+export type DrandNetworkInfo = {
     chainUrl: string
     chainHash: string
     publicKey: string
+    genesisTime: number
+    period: number
+    schemeID: string
 }
+
+export function roundForTime(time: number, info: DrandNetworkInfo): number {
+    if (time <= info.genesisTime) {
+        throw Error("Encryption time cannot be on or before the genesis of the network")
+    }
+    const timeUntilRound = time - info.genesisTime
+    return Math.ceil(timeUntilRound / info.period)
+}
+
 export type DrandHttpClientOptions = {
     fetchJson(input: string | URL): Promise<unknown>
 }
 
 class DrandHttpClient implements DrandClient {
     constructor(
-        private options: DrandClientOptions,
+        private options: DrandNetworkInfo,
         private config: DrandHttpClientOptions
     ) {
     }
@@ -53,7 +68,7 @@ class DrandHttpClient implements DrandClient {
         }
     }
 
-    static createFetchClient(options: DrandClientOptions = defaultClientOptions): DrandHttpClient {
+    static createFetchClient(options: DrandNetworkInfo = defaultClientInfo): DrandHttpClient {
         const fetchSuccess = async (url: string | URL) => {
             const response = await fetch(url)
             if (!response.ok) {

@@ -1,10 +1,9 @@
-import {Stanza} from "./age-encrypt-decrypt";
-
+import {Stanza} from "./age-encrypt-decrypt"
 
 const noOpType = "no-op"
 
 class NoOpEncdec {
-    static wrap(filekey: Uint8Array): Array<Stanza> {
+    static async wrap(filekey: Uint8Array): Promise<Array<Stanza>> {
         return [{
             type: noOpType,
             args: [],
@@ -12,7 +11,7 @@ class NoOpEncdec {
         }]
     }
 
-    static unwrap(recipients: Array<Stanza>): Uint8Array {
+    static async unwrap(recipients: Array<Stanza>): Promise<Uint8Array> {
         if (recipients.length !== 1) {
             throw Error("NoOpEncDec only expects a single stanza!")
         }

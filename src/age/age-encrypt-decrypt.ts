@@ -3,12 +3,11 @@ import {random} from "./random"
 import {NoOpEncdec} from "./no-op-encdec"
 import {readAge, writeAge} from "./age-reader-writer"
 import {createMacKey} from "./hmac"
-import {unpaddedBase64, unpaddedBase64Buffer} from "./util";
-import exp from "constants";
+import {unpaddedBase64Buffer} from "./util"
 
 type FileKey = Uint8Array
-type EncryptionWrapper = (fileKey: FileKey) => Array<Stanza>
-type DecryptionWrapper = (recipients: Array<Stanza>) => FileKey
+type EncryptionWrapper = (fileKey: FileKey) => Promise<Array<Stanza>>
+type DecryptionWrapper = (recipients: Array<Stanza>) => Promise<FileKey>
 
 // `Stanza` is a section of the age header that encapsulates the file key as
 // encrypted to a specific recipient.
@@ -23,15 +22,15 @@ const hkdfHeaderMessage = "header"
 
 // encrypts a plaintext payload using AGE by generating a filekey
 // and passing the filekey to another encryption wrapper for handling
-export function encryptAge(
+export async function encryptAge(
     plaintext: Uint8Array,
     wrappedEncryption: EncryptionWrapper = NoOpEncdec.wrap
-): string {
+): Promise<string> {
     const fileKey = random(32)
     const encryptionParams = {
         fileKey,
         version: ageVersion,
-        recipients: wrappedEncryption(fileKey),
+        recipients: await wrappedEncryption(fileKey),
         headerMacMessage: hkdfHeaderMessage,
         body: encryptedPayload(fileKey, plaintext)
     }
@@ -46,17 +45,17 @@ function encryptedPayload(fileKey: Uint8Array, payload: Uint8Array): Uint8Array 
 // decrypts a payload that has been encrypted using AGE
 // can unwrap any internal encryption by passing recipients who can
 // provide the `filekey` created during encryption
-export function decryptAge(
+export async function decryptAge(
     payload: string,
     unwrapEncryption: DecryptionWrapper = NoOpEncdec.unwrap
-): string {
+): Promise<string> {
     const encryptedPayload = readAge(payload)
     const version = encryptedPayload.header.version
     if (version !== ageVersion) {
         throw Error(`The payload version ${version} is not supported, only ${ageVersion}`)
     }
 
-    const fileKey = unwrapEncryption(encryptedPayload.header.recipients)
+    const fileKey = await unwrapEncryption(encryptedPayload.header.recipients)
     const header = sliceUntil(payload, "---")
     const expectedMac = createMacKey(fileKey, hkdfHeaderMessage, header)
 
@@ -67,7 +66,7 @@ export function decryptAge(
     return Buffer.from(STREAM.open(encryptedPayload.body, fileKey)).toString("utf8")
 }
 
-// slices a the input string up to and including the first
+// slices the input string up to and including the first
 // occurrence of the string provided in `searchTerm`
 // returns the whole string if it's not found
 // e.g. sliceUntil("hello world", "ll") will return "hell"

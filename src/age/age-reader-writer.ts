@@ -91,8 +91,8 @@ const recipient = (stanza: Stanza) => {
     return `-> ${type} ${aggregatedArgs}\n${encodedBody}`
 }
 
-// The `---` preceding is technically part
-// of the MAC-able text, but _not_ the space
+// The `---` preceding is technically part of the MAC-able text
+// so it's included in the header instead
 const mac = (macStr: Uint8Array) =>
     `${unpaddedBase64(macStr)}`
 
