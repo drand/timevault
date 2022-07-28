@@ -1,4 +1,5 @@
 import {createMacKey} from "./hmac"
+import {unpaddedBase64} from "./util"
 
 type Stanza = {
     type: string,
@@ -85,7 +86,7 @@ const recipients = (stanzas: Array<Stanza>) =>
 const recipient = (stanza: Stanza) => {
     const type = stanza.type
     const aggregatedArgs = stanza.args.join(" ")
-    const encodedBody = Buffer.from(stanza.body).toString("base64")
+    const encodedBody = unpaddedBase64(stanza.body)
 
     return `-> ${type} ${aggregatedArgs}\n${encodedBody}`
 }
@@ -93,7 +94,7 @@ const recipient = (stanza: Stanza) => {
 // The `---` preceding is technically part
 // of the MAC-able text, but _not_ the space
 const mac = (macStr: Uint8Array) =>
-    `${Buffer.from(macStr).toString("base64")}`
+    `${unpaddedBase64(macStr)}`
 
 const ciphertext = (body: Uint8Array) =>
     Buffer.from(body).toString("binary")
