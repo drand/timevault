@@ -22,8 +22,7 @@
     "isolatedModules": false,
     "types": [
       "node",
-      "mocha",
-      "src/types/**"
+      "mocha"
     ]
   },
   "include": [
