@@ -5,7 +5,7 @@ export async function random(n: number): Promise<Uint8Array> {
     }
 
     // parcel likes to resolve polyfills for things even if they aren't used
-    // so this indirection tricks it into not complaining :)
+    // so this indirection tricks it into not doing it and not complaining :)
     const x = "crypto"
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const bytes = require(x).randomBytes(n)

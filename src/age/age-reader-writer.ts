@@ -25,7 +25,7 @@ type AgeEncryptionOutput = {
 }
 
 // takes the model to be encrypted and encodes everything to a string
-// inserting newlines other tags and the hmac as per the spec
+// inserting newlines, other tags and the hmac as per the spec
 export function writeAge(input: AgeEncryptionInput): string {
     const headerStr = header(input)
     const macKey = mac(createMacKey(input.fileKey, input.headerMacMessage, headerStr))
@@ -40,7 +40,8 @@ export function header(input: AgeEncryptionInput): string {
 
 // parses an AGE encrypted string into a model object with all the
 // relevant parts encoded correctly
-// throws errors if things are missing or in the wrong place
+// throws an error if things are missing, in the wrong place or cannot
+// be parsed
 export function readAge(input: string): AgeEncryptionOutput {
     const [version, ...lines] = input.split("\n")
 
@@ -91,7 +92,7 @@ const recipient = (stanza: Stanza) => {
     return `-> ${type} ${aggregatedArgs}\n${encodedBody}`
 }
 
-// The `---` preceding is technically part of the MAC-able text
+// The `---` preceding the MAC is technically part of the MAC-able text
 // so it's included in the header instead
 const mac = (macStr: Uint8Array) =>
     `${unpaddedBase64(macStr)}`
