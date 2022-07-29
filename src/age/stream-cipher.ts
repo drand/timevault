@@ -8,7 +8,7 @@
 //
 // age spec:
 // After the header the binary payload is nonce || STREAM[HKDF[nonce, "payload"](file key)](plaintext) where nonce is random(16) and STREAM is from Online Authenticated-Encryption and its Nonce-Reuse Misuse-Resistance with ChaCha20-Poly1305 in 64KiB chunks and a nonce structure of 11 bytes of big endian counter, and 1 byte of last block flag (0x00 / 0x01). (The STREAM scheme is similar to the one Tink and Miscreant use, but without nonce prefix as we use HKDF, and with ChaCha20-Poly1305 instead of AES-GCM because the latter is unreasonably hard to do well or fast without hardware support.)
-import * as crypto from "crypto"
+import JSChaCha20 from "js-chacha20"
 
 const CHUNK_SIZE = 64 * 1024; // 64 KiB
 const TAG_SIZE = 16; // Poly1305 MAC size
@@ -78,7 +78,9 @@ export class STREAM {
         if (this.nonce[11] === 1) throw new Error("Last chunk has been processed")
         if (isLast) this.nonce[11] = 1
         const plaintext = ChaCha20Poly1305.decrypt(this.key, chunk, this.nonce)
-        output.set(plaintext)
+        // for some reason the impl of ChaCha poly pads plaintext with gibberish
+        const correctLengthPlainText = plaintext.slice(0, output.length)
+        output.set(correctLengthPlainText)
         this.incrementCounter()
     }
 
@@ -103,26 +105,13 @@ export class STREAM {
 }
 
 // ChaCha20-Poly1305 from RFC 7539.
-const CHACHA_NAME = "chacha20-poly1305"
 const CNS = 12; // chacha nonce size
 export class ChaCha20Poly1305 {
     static encrypt(privateKey: ui8a, plaintext: ui8a, nonce: ui8a = new Uint8Array(CNS)): ui8a {
-        const cipher = crypto.createCipheriv(CHACHA_NAME, privateKey, nonce, {authTagLength: TAG_SIZE})
-        const head = cipher.update(plaintext)
-        const final = cipher.final()
-        const tag = cipher.getAuthTag()
-        const ciphertext = Buffer.concat([tag, head, final])
-        return new Uint8Array(ciphertext)
+        return new JSChaCha20(privateKey, nonce).encrypt(plaintext)
     }
 
     static decrypt(privateKey: ui8a, ciphertext: ui8a, nonce: ui8a = new Uint8Array(CNS)): ui8a {
-        const decipher = crypto.createDecipheriv(CHACHA_NAME, privateKey, nonce, {authTagLength: TAG_SIZE})
-        // Tag is first 16 bytes. The other part is ciphertext.
-        const tag = ciphertext.slice(0, TAG_SIZE)
-        decipher.setAuthTag(tag)
-        const plaintext = decipher.update(ciphertext.slice(TAG_SIZE))
-        const final = decipher.final()
-        const res = Buffer.concat([plaintext, final])
-        return new Uint8Array(res)
+        return new JSChaCha20(privateKey, nonce).decrypt(ciphertext)
     }
 }

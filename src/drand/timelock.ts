@@ -21,7 +21,7 @@ export async function timelockDecrypt(ciphertext: string): Promise<string> {
 
 const timelockTypeName = "tlock"
 
-function createTimelockEncrypter(network: DrandClient, roundNumber: number) {
+export function createTimelockEncrypter(network: DrandClient, roundNumber: number) {
     return async (filekey: Uint8Array): Promise<Array<Stanza>> => {
         // probably should get chainHash through /info
 
@@ -33,7 +33,7 @@ function createTimelockEncrypter(network: DrandClient, roundNumber: number) {
     }
 }
 
-function createTimelockDecrypter(network: DrandClient) {
+export function createTimelockDecrypter(network: DrandClient) {
     return async (recipients: Array<Stanza>): Promise<Uint8Array> => {
         if (recipients.length !== 1) {
             throw Error("Timelock only expects a single stanza!")
@@ -57,6 +57,7 @@ function createTimelockDecrypter(network: DrandClient) {
             throw Error("Expected the roundNumber arg to be a number, but it was not!")
         }
 
+        // just some pointless fetching of beacons to get realistic performance
         const beacon = await network.get(roundNumberParsed)
         console.log(`beacon received: ${beacon}`)
 

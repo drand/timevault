@@ -3,11 +3,10 @@ import {random} from "../../src/age/random"
 import {readAge, writeAge} from "../../src/age/age-reader-writer"
 
 describe("AGE", () => {
-    describe("writer", () => {
-
+    describe("writer", async () => {
         const helloWorld = new Uint8Array(Buffer.from("hello world"))
         const params = {
-            fileKey: random(32),
+            fileKey: await random(32),
             version: "my-encrypter/1",
             recipients: [],
             headerMacMessage: "banana",

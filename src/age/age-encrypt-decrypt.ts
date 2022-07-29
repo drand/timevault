@@ -26,7 +26,7 @@ export async function encryptAge(
     plaintext: Uint8Array,
     wrappedEncryption: EncryptionWrapper = NoOpEncdec.wrap
 ): Promise<string> {
-    const fileKey = random(32)
+    const fileKey = await random(32)
     const encryptionParams = {
         fileKey,
         version: ageVersion,
@@ -59,10 +59,10 @@ export async function decryptAge(
     const header = sliceUntil(payload, "---")
     const expectedMac = createMacKey(fileKey, hkdfHeaderMessage, header)
 
-
     if (Buffer.compare(unpaddedBase64Buffer(expectedMac), encryptedPayload.header.mac) !== 0) {
         throw Error("The MAC did not validate for the filekey and payload!")
     }
+
     return Buffer.from(STREAM.open(encryptedPayload.body, fileKey)).toString("utf8")
 }
 

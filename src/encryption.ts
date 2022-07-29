@@ -28,8 +28,9 @@ async function encrypt(plaintext: string, decryptionTime: number): Promise<Compl
 }
 
 async function decrypt(ciphertext: string, decryptionTime: number): Promise<CompletedWebForm> {
+    const plaintext = await timelockDecrypt(ciphertext)
     return {
-        plaintext: await timelockDecrypt(ciphertext),
+        plaintext,
         decryptionTime,
         ciphertext,
     }
