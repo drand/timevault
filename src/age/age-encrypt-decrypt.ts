@@ -24,13 +24,13 @@ const hkdfHeaderMessage = "header"
 // and passing the filekey to another encryption wrapper for handling
 export async function encryptAge(
     plaintext: Uint8Array,
-    wrappedEncryption: EncryptionWrapper = NoOpEncdec.wrap
+    wrapFileKey: EncryptionWrapper = NoOpEncdec.wrap
 ): Promise<string> {
     const fileKey = await random(32)
     const encryptionParams = {
         fileKey,
         version: ageVersion,
-        recipients: await wrappedEncryption(fileKey),
+        recipients: await wrapFileKey(fileKey),
         headerMacMessage: hkdfHeaderMessage,
         body: encryptedPayload(fileKey, plaintext)
     }
@@ -47,7 +47,7 @@ function encryptedPayload(fileKey: Uint8Array, payload: Uint8Array): Uint8Array 
 // provide the `filekey` created during encryption
 export async function decryptAge(
     payload: string,
-    unwrapEncryption: DecryptionWrapper = NoOpEncdec.unwrap
+    unwrapFileKey: DecryptionWrapper = NoOpEncdec.unwrap
 ): Promise<string> {
     const encryptedPayload = readAge(payload)
     const version = encryptedPayload.header.version
@@ -55,7 +55,7 @@ export async function decryptAge(
         throw Error(`The payload version ${version} is not supported, only ${ageVersion}`)
     }
 
-    const fileKey = await unwrapEncryption(encryptedPayload.header.recipients)
+    const fileKey = await unwrapFileKey(encryptedPayload.header.recipients)
     const header = sliceUntil(payload, "---")
     const expectedMac = createMacKey(fileKey, hkdfHeaderMessage, header)
 

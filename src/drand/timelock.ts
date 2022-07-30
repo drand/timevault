@@ -2,14 +2,22 @@ import {defaultClientInfo, DrandClient, DrandNetworkInfo, DrandHttpClient} from 
 import {decryptAge, encryptAge, Stanza} from "../age/age-encrypt-decrypt"
 import {encodeArmor, decodeArmor, isProbablyArmored} from "../age/armor"
 
-export async function timelockEncrypt(config: DrandNetworkInfo, roundNumber: number, payload: string): Promise<string> {
-    const timelockEncrypter = createTimelockEncrypter(DrandHttpClient.createFetchClient(), roundNumber)
+export async function timelockEncrypt(
+    config: DrandNetworkInfo,
+    roundNumber: number,
+    payload: string,
+    drandHttpClient: DrandClient = DrandHttpClient.createFetchClient(),
+): Promise<string> {
+    const timelockEncrypter = createTimelockEncrypter(drandHttpClient, roundNumber)
     const agePayload = await encryptAge(Buffer.from(payload), timelockEncrypter)
     return encodeArmor(agePayload)
 }
 
-export async function timelockDecrypt(ciphertext: string): Promise<string> {
-    const timelockDecrypter = createTimelockDecrypter(DrandHttpClient.createFetchClient())
+export async function timelockDecrypt(
+    ciphertext: string,
+    drandHttpClient: DrandClient = DrandHttpClient.createFetchClient()
+): Promise<string> {
+    const timelockDecrypter = createTimelockDecrypter(drandHttpClient)
 
     let cipher = ciphertext
     if (isProbablyArmored(ciphertext)) {
@@ -22,6 +30,10 @@ export async function timelockDecrypt(ciphertext: string): Promise<string> {
 const timelockTypeName = "tlock"
 
 export function createTimelockEncrypter(network: DrandClient, roundNumber: number) {
+    if (roundNumber < 1) {
+        throw Error("You cannot encrypt for a roundNumber less than 1 (genesis = 0)")
+    }
+
     return async (filekey: Uint8Array): Promise<Array<Stanza>> => {
         // probably should get chainHash through /info
 
@@ -59,7 +71,7 @@ export function createTimelockDecrypter(network: DrandClient) {
 
         // just some pointless fetching of beacons to get realistic performance
         const beacon = await network.get(roundNumberParsed)
-        console.log(`beacon received: ${beacon}`)
+        console.log(`beacon received: ${JSON.stringify(beacon)}`)
 
         return body
     }
