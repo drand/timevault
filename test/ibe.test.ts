@@ -1,6 +1,6 @@
-import {Fp, Fp2, Fp12} from '@noble/bls12-381';
-import {fp12ToBytes, fp2ToBytes, fpToBytes} from "../src/crypto/ibe"
+import {Fp, Fp2, Fp12} from '@noble/bls12-381'
 import {expect} from "chai"
+import {fp12ToBytes, fp2ToBytes, fpToBytes} from "../src/crypto/ibe"
 
 describe("fpToBytes", () => {
     it("two Fps should combine into one", () => {
@@ -20,5 +20,14 @@ describe("fpToBytes", () => {
         const combined = Buffer.concat([one, two, three, four, five, six])
 
         expect(Buffer.compare(fullFp12, combined)).to.equal(0)
+    })
+
+    it("big nums should not lose precision", () => {
+        // a number with more than 64bits
+        const buffer = Buffer.from("ffffffffff", "hex")
+        // the same value as a `bigint`
+        const bytes = fpToBytes(new Fp(1099511627775n))
+
+        expect(Buffer.compare(buffer, bytes)).to.equal(0)
     })
 })

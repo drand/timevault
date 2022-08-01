@@ -165,8 +165,8 @@ function h4(sigma: Uint8Array, length: number) {
 }
 
 export function fpToBytes(fp: Fp): Uint8Array {
-    const buf = Buffer.alloc(16)
     const hex = BigInt(fp.value).toString(16)
+    const buf = Buffer.alloc(hex.length / 2)
     buf.write(hex, "hex")
     return buf
 }
