@@ -10,7 +10,7 @@ import JSChaCha20 from "js-chacha20"
 const CHUNK_SIZE = 64 * 1024; // 64 KiB
 const TAG_SIZE = 16; // Poly1305 MAC size
 const ENCRYPTED_CHUNK_SIZE = CHUNK_SIZE + TAG_SIZE
-const NONCE_SIZE = 11; // STREAM nonce size
+const NONCE_SIZE = 12; // STREAM nonce size
 
 type ui8a = Uint8Array
 
@@ -56,7 +56,7 @@ export class STREAM {
 
     constructor(key: ui8a) {
         this.key = key.slice()
-        this.nonce = new Uint8Array(NONCE_SIZE + 1)
+        this.nonce = new Uint8Array(NONCE_SIZE)
         this.nonceView = new DataView(this.nonce.buffer)
         this.counter = 0
     }
