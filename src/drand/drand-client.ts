@@ -21,17 +21,21 @@ export type DrandNetworkInfo = {
     chainUrl: string
     chainHash: string
     publicKey: string
-    genesisTime: number
-    period: number
+    genesisTime: number // in epoch seconds
+    period: number // in seconds
     schemeID: string
 }
 
 export function roundForTime(time: number, info: DrandNetworkInfo): number {
-    if (time <= info.genesisTime) {
+    const genesisTimeMs = info.genesisTime * 1000
+    const periodMs = info.period * 1000
+
+    if (time <= genesisTimeMs) {
         throw Error("Encryption time cannot be on or before the genesis of the network")
     }
-    const timeUntilRound = time - info.genesisTime
-    return Math.ceil(timeUntilRound / info.period)
+
+    const timeUntilRound = time - genesisTimeMs
+    return Math.ceil(timeUntilRound / periodMs)
 }
 
 export type DrandHttpClientOptions = {
@@ -71,6 +75,9 @@ class DrandHttpClient implements DrandClient {
     static createFetchClient(options: DrandNetworkInfo = defaultClientInfo): DrandHttpClient {
         const fetchSuccess = async (url: string | URL) => {
             const response = await fetch(url)
+            if (response.status === 404) {
+                throw new Error(`It's too early to decrypt!`)
+            }
             if (!response.ok) {
                 throw new Error(`Error reaching drand: ${response.status}`)
             }
