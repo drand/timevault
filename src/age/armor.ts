@@ -17,6 +17,7 @@ export function encodeArmor(input: string, chunkSize = 64): string {
 // takes an armored payload and decodes it if it is an AGE armor payload
 // and it satisfies some security properties
 export function decodeArmor(armor: string, chunkSize = 64): string {
+    armor = armor.trim()
     if (!armor.startsWith(header)) {
         throw Error(`Armor cannot be decoded if it does not start with a header! i.e. ${header}`)
     }
