@@ -3,10 +3,17 @@ import {Fp, Fp2, Fp12, PointG1, utils} from '@noble/bls12-381';
 import {sha256} from "@noble/hashes/sha256"
 import {blake2s} from '@noble/hashes/blake2s';
 
-export async function encrypt(master: PointG1, ID: Uint8Array, msg: Uint8Array) {
-    //if len(msg)>>16 > 0 {
-    // we're using blake2 as XOF which only outputs 2^16-1 length
-    //	return nil, errors.New("plaintext too long for blake2")
+export interface Ciphertext {
+    U: PointG1;
+    V: Uint8Array;
+    W: Uint8Array;
+  }
+  
+export async function encrypt(master: PointG1, ID: Uint8Array, msg: Uint8Array): Promise<Ciphertext> {
+    if (msg.length>>16 > 0) {
+        // we're using blake2 as XOF which only outputs at most 2^16-1 bytes
+        throw new Error("cannot encrypt messages larger than 2^16-1 bytes.");
+    }
 
 
     // 1. Compute Gid = e(master,Q_id)
@@ -22,25 +29,23 @@ export async function encrypt(master: PointG1, ID: Uint8Array, msg: Uint8Array) 
 
     // 5. Compute V = sigma XOR H2(rGid)
     const rGid = Gid.multiply(r);
-    const hrGid = gtToHash(rGid, msg.length)
+    const hrGid = await gtToHash(rGid, msg.length)
 
-    // V := xor(sigma, hrGid)
+    const V = xor(sigma, hrGid)
 
-    // // 6. Compute M XOR H(sigma)
-    // hsigma, err := h4(sigma, len(msg))
+    // 6. Compute M XOR H(sigma)
+    const hsigma = h4(sigma, msg.length)
 
-    // W := xor(msg, hsigma)
+    const W = xor(msg, hsigma)
 
-    // return &Ciphertext{
-    // 	U: U,
-    // 	V: V,
-    // 	W: W,
-    // }, nil
-
+    return {
+     	U: U,
+     	V: V,
+     	W: W,
+     }
 }
 
-
-// func Decrypt(s pairing.Suite, private kyber.Point, c *Ciphertext) ([]byte, error) {
+export async function decrypt(private: PointG2, ciph: Ciphertext): Uint8Array {
 // 	// 1. Compute sigma = V XOR H2(e(rP,private))
 // 	gidt := s.Pair(c.U, private)
 // 	hgidt, err := gtToHash(gidt, len(c.W), H2Tag())
@@ -71,12 +76,11 @@ export async function encrypt(master: PointG1, ID: Uint8Array, msg: Uint8Array) 
 // 	}
 // 	return msg, nil
 
-// }
+}
 
-function xor(a: Uint8Array, b: Uint8Array) {
+function xor(a: Uint8Array, b: Uint8Array): Uint8Array {
     if (a.length != b.length) {
-        console.log("Error: incompatible sizes");
-        return;
+        throw new Error("Error: incompatible sizes");
     }
 
     const ret = new Uint8Array(a.length);
@@ -88,8 +92,28 @@ function xor(a: Uint8Array, b: Uint8Array) {
     return ret;
 }
 
-const maxSize = 1 << 10;
 
+////// code from Noble: 
+////// https://github.com/paulmillr/noble-bls12-381/blob/6380415f1b7e5078c8883a5d8d687f2dd3bff6c2/index.ts#L132-L145
+function bytesToNumberBE(uint8a: Uint8Array): bigint {
+    if (!(uint8a instanceof Uint8Array)) throw new Error('Expected Uint8Array');
+    return BigInt('0x' + bytesToHex(Uint8Array.from(uint8a)));
+}
+
+const hexes = Array.from({length: 256}, (v, i) => i.toString(16).padStart(2, '0'));
+
+function bytesToHex(uint8a: Uint8Array): string {
+// pre-caching chars could speed this up 6x.
+    let hex = '';
+    for (let i = 0; i < uint8a.length; i++) {
+        hex += hexes[uint8a[i]];
+    }
+    return hex;
+}
+////// end of code from Noble.
+
+
+// Our IBE hashes
 function h3(sigma: Uint8Array, msg: Uint8Array) {
     const b2params = {dkLen: 32};
     const h3ret = blake2s
@@ -120,39 +144,20 @@ function toField(h3ret: Uint8Array) {
     return n
 }
 
-////// code from Noble: 
-////// https://github.com/paulmillr/noble-bls12-381/blob/6380415f1b7e5078c8883a5d8d687f2dd3bff6c2/index.ts#L132-L145
-function bytesToNumberBE(uint8a: Uint8Array): bigint {
-    if (!(uint8a instanceof Uint8Array)) throw new Error('Expected Uint8Array');
-    return BigInt('0x' + bytesToHex(Uint8Array.from(uint8a)));
-}
-
-const hexes = Array.from({length: 256}, (v, i) => i.toString(16).padStart(2, '0'));
-
-function bytesToHex(uint8a: Uint8Array): string {
-// pre-caching chars could speed this up 6x.
-    let hex = '';
-    for (let i = 0; i < uint8a.length; i++) {
-        hex += hexes[uint8a[i]];
-    }
-    return hex;
-}
-
-////// end of code from Noble.
-
-
-async function gtToHash(gt: bls.Fp12, length: number) {
+// maxSize used for our Blake2s XOF output.
+const maxSize = 1 << 10;
+function gtToHash(gt: bls.Fp12, length: number): Uint8Array {
     const b2params = {dkLen: maxSize};
 
     const hgtret = blake2s
         .create(b2params)
-        //.update(gt.toBytes())
+        .update(fp12ToBytes(gt))
         .digest();
 
     return hgtret
 }
 
-function h4(sigma: Uint8Array, length: number) {
+function h4(sigma: Uint8Array, length: number): Uint8Array {
     const b2params = {dkLen: maxSize};
 
     const h4sigma = blake2s
@@ -164,6 +169,7 @@ function h4(sigma: Uint8Array, length: number) {
     return h4sigma.slice(0, length)
 }
 
+// Function to convert Noble's FPs to byte arrays compatible with Kilic library.
 export function fpToBytes(fp: Fp): Uint8Array {
     const hex = BigInt(fp.value).toString(16)
     const buf = Buffer.alloc(hex.length / 2)
