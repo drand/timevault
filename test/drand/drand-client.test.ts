@@ -1,6 +1,6 @@
 import * as chai from "chai"
 import {AssertionError, expect} from "chai"
-import {defaultClientOptions, DrandHttpClient} from "../../src/drand/drand-client"
+import {defaultClientInfo, DrandHttpClient} from "../../src/drand/drand-client"
 import chaiAsPromised from "chai-as-promised"
 
 chai.use(chaiAsPromised)
@@ -9,7 +9,7 @@ describe("drand-client", () => {
     it("propagates errors from the fetch call", async () => {
         const expectedErrorMessage = "broken"
         const errorFetch = () => Promise.reject(expectedErrorMessage)
-        const client = new DrandHttpClient(defaultClientOptions, {fetchJson: errorFetch})
+        const client = new DrandHttpClient(defaultClientInfo, {fetchJson: errorFetch})
 
         return expect(client.get(1)).to.be.rejectedWith(expectedErrorMessage)
     })
@@ -18,7 +18,7 @@ describe("drand-client", () => {
         const round = 1
         const responseJson = {round, randomness: "zzzzz", signature: "deadbeef"}
         const successFetch = () => Promise.resolve(responseJson)
-        const client = new DrandHttpClient(defaultClientOptions, {fetchJson: successFetch})
+        const client = new DrandHttpClient(defaultClientInfo, {fetchJson: successFetch})
 
         await assertError(() => client.get(round))
     })
@@ -27,7 +27,7 @@ describe("drand-client", () => {
         const round = 1
         const responseJson = {round, randomness: "deadbeef", signature: "zzzzzz"}
         const successFetch = () => Promise.resolve(responseJson)
-        const client = new DrandHttpClient(defaultClientOptions, {fetchJson: successFetch})
+        const client = new DrandHttpClient(defaultClientInfo, {fetchJson: successFetch})
 
         await assertError(() => client.get(round))
     })
@@ -42,7 +42,7 @@ describe("drand-client", () => {
         }
         const successFetch = () => Promise.resolve(json)
         const client = new DrandHttpClient({
-            ...defaultClientOptions,
+            ...defaultClientInfo,
             publicKey: nonMatchingPublicKey,
         }, {fetchJson: successFetch})
 
@@ -59,7 +59,7 @@ describe("drand-client", () => {
             signature: "00f924c8e490b58125d8976d517598dd2c13baad96df75d75d6d575ad2c1b4a8193313f733e7e56b474ac009b8661ec301ba05def4e0fe95a2bf351ded9118c8db36efcc8f66e010f1b8fe15050fb6cc9c069a2bd5cabe20dfe4f8e3befb6c2a"
         }
         const successFetch = () => Promise.resolve(json)
-        const client = new DrandHttpClient(defaultClientOptions, {fetchJson: successFetch})
+        const client = new DrandHttpClient(defaultClientInfo, {fetchJson: successFetch})
 
         await assertError(() => client.get(roundNumber))
     })
@@ -73,7 +73,7 @@ describe("drand-client", () => {
         }
         const successFetch = () => Promise.resolve(json)
 
-        const client = new DrandHttpClient(defaultClientOptions, {fetchJson: successFetch})
+        const client = new DrandHttpClient(defaultClientInfo, {fetchJson: successFetch})
         const result = await client.get(roundNumber)
 
         expect(result).deep.equal(json)

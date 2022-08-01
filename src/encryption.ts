@@ -1,6 +1,7 @@
 import * as yup from "yup"
 import {webFormSchema} from "./schema/webform-schema"
-import {DrandHttpClient} from "./drand/drand-client";
+import {defaultClientInfo, roundForTime} from "./drand/drand-client"
+import {timelockDecrypt, timelockEncrypt} from "./drand/timelock"
 
 export type CompletedWebForm = yup.InferType<typeof webFormSchema>
 
@@ -18,20 +19,20 @@ export async function encryptedOrDecryptedFormData(form: unknown): Promise<Compl
 }
 
 async function encrypt(plaintext: string, decryptionTime: number): Promise<CompletedWebForm> {
-    const drandClient = DrandHttpClient.createFetchClient()
-    const {randomness} = await drandClient.getLatest()
-    return Promise.resolve({
+    const roundNumber = roundForTime(decryptionTime, defaultClientInfo)
+    return {
         plaintext,
         decryptionTime,
-        ciphertext: Buffer.from(plaintext + decryptionTime + randomness).toString("base64")
-    })
+        ciphertext: await timelockEncrypt(defaultClientInfo, roundNumber, plaintext)
+    }
 }
 
-function decrypt(ciphertext: string, decryptionTime: number): Promise<CompletedWebForm> {
-    return Promise.resolve({
-        plaintext: "some great fake decryption",
+async function decrypt(ciphertext: string, decryptionTime: number): Promise<CompletedWebForm> {
+    const plaintext = await timelockDecrypt(ciphertext)
+    return {
+        plaintext,
         decryptionTime,
         ciphertext,
-    })
+    }
 }
 
