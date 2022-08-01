@@ -72,17 +72,19 @@ export async function decryptAge(
 // e.g. sliceUntil("hello world", "ll") will return "hell"
 function sliceUntil(input: string, searchTerm: string) {
     let lettersMatched = 0
-    for (let i = 0; i < input.length; ++i) {
-        if (lettersMatched === searchTerm.length) {
-            return input.slice(0, i)
-        }
+    let inputPointer = 0
 
-        if (input[i] === searchTerm[lettersMatched]) {
+    while (inputPointer < input.length && lettersMatched < searchTerm.length) {
+        if (input[inputPointer] === searchTerm[lettersMatched]) {
             ++lettersMatched
+        } else if (input[inputPointer] === searchTerm[0]) {
+            lettersMatched = 1
         } else {
             lettersMatched = 0
         }
+
+        ++inputPointer
     }
 
-    return input
+    return input.slice(0, inputPointer)
 }
