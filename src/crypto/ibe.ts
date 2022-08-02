@@ -1,5 +1,5 @@
 import * as bls from '@noble/bls12-381';
-import {Fp, Fp2, Fp12, PointG1, utils} from '@noble/bls12-381';
+import {Fp, Fp2, Fp12, PointG1, PointG2, utils} from '@noble/bls12-381';
 import {sha256} from "@noble/hashes/sha256"
 import {blake2s} from '@noble/hashes/blake2s';
 
@@ -45,37 +45,28 @@ export async function encrypt(master: PointG1, ID: Uint8Array, msg: Uint8Array):
      }
 }
 
-export async function decrypt(private: PointG2, ciph: Ciphertext): Uint8Array {
-// 	// 1. Compute sigma = V XOR H2(e(rP,private))
-// 	gidt := s.Pair(c.U, private)
-// 	hgidt, err := gtToHash(gidt, len(c.W), H2Tag())
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	if len(hgidt) != len(c.V) {
-// 		return nil, fmt.Errorf("XorSigma is of invalid length: exp %d vs got %d", len(hgidt), len(c.V))
-// 	}
-// 	sigma := xor(hgidt, c.V)
+export async function decrypt(p: PointG2, c: Ciphertext): Promise<Uint8Array> {
+    // 1. Compute sigma = V XOR H2(e(rP,private))
+    const gidt = bls.pairing(c.U, p)
+ 	const hgidt = gtToHash(gidt, c.W.length)
 
-// 	// 2. Compute M = W XOR H4(sigma)
-// 	hsigma, err := h4(sigma, len(c.W))
-// 	if err != nil {
-// 		return nil, err
-// 	}
+ 	if (hgidt.length != c.V.length) {
+        throw new Error("XorSigma is of invalid length")
+ 	}
+    const sigma = xor(hgidt, c.V)
 
-// 	msg := xor(hsigma, c.W)
+	// 2. Compute M = W XOR H4(sigma)
+    const hsigma = h4(sigma, c.W.length)
 
-// 	// 3. Check U = rP
-// 	r, err := h3(s, sigma, msg)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	rP := s.G1().Point().Mul(r, s.G1().Point().Base())
-// 	if !rP.Equal(c.U) {
-// 		return nil, fmt.Errorf("invalid proof: rP check failed")
-// 	}
-// 	return msg, nil
+    const msg = xor(hsigma, c.W)
 
+    // 	3. Check U = rP
+    const r = h3(sigma, msg)
+    const rP =  bls.PointG1.BASE.multiply(r)
+    if (!rP.equals(c.U)) {
+        throw new Error("invalid proof: rP check failed")
+ 	}
+ 	return msg
 }
 
 function xor(a: Uint8Array, b: Uint8Array): Uint8Array {
@@ -114,19 +105,6 @@ function bytesToHex(uint8a: Uint8Array): string {
 
 
 // Our IBE hashes
-function h3(sigma: Uint8Array, msg: Uint8Array) {
-    const b2params = {dkLen: 32};
-    const h3ret = blake2s
-        .create(b2params)
-        .update("IBE-H3")
-        .update(sigma)
-        .update(msg)
-        .digest();
-
-    const ret = toField(h3ret);
-    return ret
-}
-
 const BitsToMaskForBLS12381 = 1;
 
 // we are hashing the data until we get a value smaller than the curve order
@@ -146,27 +124,41 @@ function toField(h3ret: Uint8Array) {
 
 // maxSize used for our Blake2s XOF output.
 const maxSize = 1 << 10;
-function gtToHash(gt: bls.Fp12, length: number): Uint8Array {
+function gtToHash(gt: bls.Fp12, len: number): Uint8Array {
     const b2params = {dkLen: maxSize};
 
     const hgtret = blake2s
         .create(b2params)
+        .update("IBE-H2")
         .update(fp12ToBytes(gt))
         .digest();
 
-    return hgtret
+    return hgtret.slice(0, len)
 }
 
-function h4(sigma: Uint8Array, length: number): Uint8Array {
+function h3(sigma: Uint8Array, msg: Uint8Array) {
+    const b2params = {dkLen: 32};
+    const h3ret = blake2s
+        .create(b2params)
+        .update("IBE-H3")
+        .update(sigma)
+        .update(msg)
+        .digest();
+
+    const ret = toField(h3ret);
+    return ret
+}
+
+function h4(sigma: Uint8Array, len: number): Uint8Array {
     const b2params = {dkLen: maxSize};
 
     const h4sigma = blake2s
         .create(b2params)
-        .update("IBE-H2")
+        .update("IBE-H4")
         .update(sigma)
         .digest();
 
-    return h4sigma.slice(0, length)
+    return h4sigma.slice(0, len)
 }
 
 // Function to convert Noble's FPs to byte arrays compatible with Kilic library.
