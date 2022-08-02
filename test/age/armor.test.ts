@@ -53,5 +53,10 @@ describe("armor", () => {
             const somePlaintext = "wow that's a lot of armor"
             expect(decodeArmor(encodeArmor(somePlaintext))).to.equal(somePlaintext)
         })
+
+        it("should ignore whitespace at the beginning and end when decoding", () => {
+            const somePlaintext = "wow that's a lot of armor"
+            expect(decodeArmor("   \n " + encodeArmor(somePlaintext) + "\t \n  ")).to.equal(somePlaintext)
+        })
     })
 })

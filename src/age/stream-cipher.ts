@@ -5,7 +5,7 @@
 
 // age spec:
 // After the header the binary payload is nonce || STREAM[HKDF[nonce, "payload"](file key)](plaintext) where nonce is random(16) and STREAM is from Online Authenticated-Encryption and its Nonce-Reuse Misuse-Resistance with ChaCha20-Poly1305 in 64KiB chunks and a nonce structure of 11 bytes of big endian counter, and 1 byte of last block flag (0x00 / 0x01). (The STREAM scheme is similar to the one Tink and Miscreant use, but without nonce prefix as we use HKDF, and with ChaCha20-Poly1305 instead of AES-GCM because the latter is unreasonably hard to do well or fast without hardware support.)
-import JSChaCha20 from "js-chacha20"
+import {ChaCha20Poly1305} from "@stablelib/chacha20poly1305"
 
 const CHUNK_SIZE = 64 * 1024; // 64 KiB
 const TAG_SIZE = 16; // Poly1305 MAC size
@@ -65,7 +65,7 @@ export class STREAM {
         if (chunk.length > CHUNK_SIZE) throw new Error("Chunk is too big")
         if (this.nonce[11] === 1) throw new Error("Last chunk has been processed")
         if (isLast) this.nonce[11] = 1
-        const ciphertext = ChaCha20Poly1305.encrypt(this.key, chunk, this.nonce)
+        const ciphertext = new ChaCha20Poly1305(this.key).seal(this.nonce, chunk)
         output.set(ciphertext)
         this.incrementCounter()
     }
@@ -74,10 +74,11 @@ export class STREAM {
         if (chunk.length > ENCRYPTED_CHUNK_SIZE) throw new Error("Chunk is too big")
         if (this.nonce[11] === 1) throw new Error("Last chunk has been processed")
         if (isLast) this.nonce[11] = 1
-        const plaintext = ChaCha20Poly1305.decrypt(this.key, chunk, this.nonce)
-        // for some reason the impl of ChaCha poly pads plaintext with gibberish
-        const correctLengthPlainText = plaintext.slice(0, output.length)
-        output.set(correctLengthPlainText)
+        const plaintext = new ChaCha20Poly1305(this.key).open(this.nonce, chunk)
+        if (plaintext == null) {
+            throw Error("Error during decryption!")
+        }
+        output.set(plaintext)
         this.incrementCounter()
     }
 
@@ -98,17 +99,5 @@ export class STREAM {
         clear(this.key)
         clear(this.nonce)
         this.counter = 0
-    }
-}
-
-// ChaCha20-Poly1305 from RFC 7539.
-const CNS = 12; // chacha nonce size
-export class ChaCha20Poly1305 {
-    static encrypt(privateKey: ui8a, plaintext: ui8a, nonce: ui8a = new Uint8Array(CNS)): ui8a {
-        return new JSChaCha20(privateKey, nonce).encrypt(plaintext)
-    }
-
-    static decrypt(privateKey: ui8a, ciphertext: ui8a, nonce: ui8a = new Uint8Array(CNS)): ui8a {
-        return new JSChaCha20(privateKey, nonce).decrypt(ciphertext)
     }
 }
