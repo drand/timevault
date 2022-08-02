@@ -163,7 +163,8 @@ function h4(sigma: Uint8Array, len: number): Uint8Array {
 
 // Function to convert Noble's FPs to byte arrays compatible with Kilic library.
 export function fpToBytes(fp: Fp): Uint8Array {
-    const hex = BigInt(fp.value).toString(16)
+    // 48 bytes = 96 hex bytes
+    const hex = BigInt(fp.value).toString(16).padStart(96, "0")
     const buf = Buffer.alloc(hex.length / 2)
     buf.write(hex, "hex")
     return buf
@@ -174,6 +175,7 @@ export function fp2ToBytes(fp2: Fp2): Uint8Array {
 }
 
 // fp6 isn't exported by noble... let's take off the rails
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
 export function fp6ToBytes(fp6: any): Uint8Array {
     return Buffer.concat(fp6.c.map(fp2ToBytes))
 }
