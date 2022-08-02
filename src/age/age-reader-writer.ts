@@ -69,7 +69,7 @@ export function readAge(input: string): AgeEncryptionOutput {
 
     // mac cannot be validated yet, as we don't have the filekey
     const mac = current.slice(macStartingTag.length, current.length)
-    const ciphertext = lines.shift() ?? ""
+    const ciphertext = lines.join("") ?? ""
 
     return {
         header: {

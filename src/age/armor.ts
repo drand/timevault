@@ -36,7 +36,7 @@ export function decodeArmor(armor: string, chunkSize = 64): string {
         throw Error(`The last line of an armored payload must be less than ${chunkSize} (configurable) to stop padding attacks`)
     }
 
-    return Buffer.from(lines.join(""), "base64").toString("utf8")
+    return Buffer.from(lines.join(""), "base64").toString("binary")
 }
 
 export function isProbablyArmored(input: string): boolean {

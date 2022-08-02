@@ -73,6 +73,7 @@ export async function decryptAge(
     const nonce = encryptedPayload.body.slice(0, bodyHkdfNonceLengthBits)
     const cipherText = encryptedPayload.body.slice(bodyHkdfNonceLengthBits)
     const hkdfKey = hkdf(sha256, fileKey, nonce, Buffer.from(hkdfBodyMessage, "utf8"), 32)
+    console.log(Buffer.from(hkdfKey).toString("hex"))
 
     return Buffer.from(STREAM.open(cipherText, hkdfKey)).toString("utf8")
 }

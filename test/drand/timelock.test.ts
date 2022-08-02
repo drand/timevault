@@ -5,18 +5,9 @@ import {Beacon, defaultClientInfo, DrandClient} from "../../src/drand/drand-clie
 import {readAge} from "../../src/age/age-reader-writer"
 import chaiAsPromised from "chai-as-promised"
 import {decodeArmor} from "../../src/age/armor"
+import {MockDrandClient} from "../age/mock-drand-client"
 
 chai.use(chaiAsPromised)
-
-class MockDrandClient implements DrandClient {
-
-    constructor(private beacon: Beacon) {
-    }
-
-    get(_: number): Promise<Beacon> {
-        return Promise.resolve(this.beacon)
-    }
-}
 
 describe("timelock", () => {
     describe("encryption", () => {
