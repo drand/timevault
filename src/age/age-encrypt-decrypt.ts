@@ -3,9 +3,10 @@ import {random} from "./random"
 import {NoOpEncdec} from "./no-op-encdec"
 import {readAge, writeAge} from "./age-reader-writer"
 import {createMacKey} from "./hmac"
-import {unpaddedBase64Buffer} from "./util"
+import {unpaddedBase64, unpaddedBase64Buffer} from "./util"
 import {hkdf} from "@noble/hashes/hkdf"
 import {sha256} from "@noble/hashes/sha256"
+import {encodeArmor} from "./armor"
 
 type FileKey = Uint8Array
 type EncryptionWrapper = (fileKey: FileKey) => Promise<Array<Stanza>>
@@ -21,7 +22,7 @@ export type Stanza = {
 
 const ageVersion = "age-encryption.org/v1"
 const hkdfHeaderMessage = "header"
-const hkdfBodyMessage = "payload"
+const hkdfBodyMessage = Buffer.from("payload", "utf8")
 const filekeyLengthBits = 32
 const bodyHkdfNonceLengthBits = 16
 
@@ -32,21 +33,24 @@ export async function encryptAge(
     wrapFileKey: EncryptionWrapper = NoOpEncdec.wrap
 ): Promise<string> {
     const fileKey = await random(filekeyLengthBits)
-    const encryptionParams = {
-        fileKey,
-        version: ageVersion,
-        recipients: await wrapFileKey(fileKey),
-        headerMacMessage: hkdfHeaderMessage,
-        body: await encryptedPayload(fileKey, plaintext)
-    }
+    const recipients = await wrapFileKey(fileKey)
+    const body = await encryptedPayload(fileKey, plaintext)
 
-    return writeAge(encryptionParams)
+    return writeAge({
+            fileKey,
+            version: ageVersion,
+            recipients,
+            headerMacMessage: hkdfHeaderMessage,
+            body
+        }
+    )
 }
 
-async function encryptedPayload(fileKey: Uint8Array, payload: Uint8Array): Promise<Uint8Array> {
-    const nonce = Buffer.from(await random(bodyHkdfNonceLengthBits))
-    const hkdfKey = hkdf(sha256, fileKey, nonce, Buffer.from(hkdfBodyMessage, "utf8"), 32)
-    return Buffer.concat([Buffer.from(nonce), STREAM.seal(payload, hkdfKey)])
+async function encryptedPayload(fileKey: Uint8Array, payload: Uint8Array): Promise<Buffer> {
+    const nonce = await random(bodyHkdfNonceLengthBits)
+    const hkdfKey = hkdf(sha256, fileKey, nonce, hkdfBodyMessage, 32)
+    const ciphertext = STREAM.seal(payload, hkdfKey)
+    return Buffer.concat([nonce, ciphertext])
 }
 
 // decrypts a payload that has been encrypted using AGE
@@ -64,16 +68,16 @@ export async function decryptAge(
 
     const fileKey = await unwrapFileKey(encryptedPayload.header.recipients)
     const header = sliceUntil(payload, "---")
-    const expectedMac = createMacKey(fileKey, hkdfHeaderMessage, header)
+    const expectedMac = unpaddedBase64Buffer(createMacKey(fileKey, hkdfHeaderMessage, header))
+    const actualMac = encryptedPayload.header.mac
 
-    if (Buffer.compare(unpaddedBase64Buffer(expectedMac), encryptedPayload.header.mac) !== 0) {
+    if (Buffer.compare(actualMac, expectedMac) !== 0) {
         throw Error("The MAC did not validate for the filekey and payload!")
     }
 
-    const nonce = encryptedPayload.body.slice(0, bodyHkdfNonceLengthBits)
+    const nonce = Buffer.from(encryptedPayload.body.slice(0, bodyHkdfNonceLengthBits))
     const cipherText = encryptedPayload.body.slice(bodyHkdfNonceLengthBits)
-    const hkdfKey = hkdf(sha256, fileKey, nonce, Buffer.from(hkdfBodyMessage, "utf8"), 32)
-    console.log(Buffer.from(hkdfKey).toString("hex"))
+    const hkdfKey = hkdf(sha256, fileKey, nonce, hkdfBodyMessage, 32)
 
     return Buffer.from(STREAM.open(cipherText, hkdfKey)).toString("utf8")
 }

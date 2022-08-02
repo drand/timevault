@@ -3,7 +3,7 @@ const footer = "-----END AGE ENCRYPTED FILE-----"
 
 // takes some payload and encodes it as armor with the AGE armor headers in lines of size `chunkSize`
 export function encodeArmor(input: string, chunkSize = 64): string {
-    const base64Input = Buffer.from(input).toString("base64")
+    const base64Input = Buffer.from(input, "binary").toString("base64")
     const columnisedInput = chunked(base64Input, chunkSize).join("\n")
 
     // this case doesn't seem to be possible once base64 encoded, but it's in the spec

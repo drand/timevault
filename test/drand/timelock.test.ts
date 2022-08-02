@@ -1,7 +1,7 @@
 import * as chai from "chai"
 import {expect} from "chai"
 import {createTimelockDecrypter, timelockDecrypt, timelockEncrypt} from "../../src/drand/timelock"
-import {Beacon, defaultClientInfo, DrandClient} from "../../src/drand/drand-client"
+import {defaultClientInfo} from "../../src/drand/drand-client"
 import {readAge} from "../../src/age/age-reader-writer"
 import chaiAsPromised from "chai-as-promised"
 import {decodeArmor} from "../../src/age/armor"
@@ -50,7 +50,6 @@ describe("timelock", () => {
 
             const decryptedFileKey = await createTimelockDecrypter(mockClient)(parsedAgeEncryption.header.recipients)
             expect(decryptedFileKey.length).to.be.greaterThan(0)
-
         })
 
         it("should throw an error if multiple recipient stanzas are provided", () => {

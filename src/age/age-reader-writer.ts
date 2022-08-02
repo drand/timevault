@@ -29,7 +29,9 @@ type AgeEncryptionOutput = {
 export function writeAge(input: AgeEncryptionInput): string {
     const headerStr = header(input)
     const macKey = mac(createMacKey(input.fileKey, input.headerMacMessage, headerStr))
-    return `${headerStr} ${macKey}\n${ciphertext(input.body)}`
+    const payload = Buffer.from(input.body).toString("binary")
+
+    return `${headerStr} ${macKey}\n${payload}`
 }
 
 // ends with a `---`, as this is included in the header when
@@ -37,6 +39,22 @@ export function writeAge(input: AgeEncryptionInput): string {
 export function header(input: AgeEncryptionInput): string {
     return `${input.version}\n${recipients(input.recipients)}---`
 }
+
+const recipients = (stanzas: Array<Stanza>) =>
+    stanzas.map(it => recipient(it) + "\n")
+
+const recipient = (stanza: Stanza) => {
+    const type = stanza.type
+    const aggregatedArgs = stanza.args.join(" ")
+    const encodedBody = unpaddedBase64(stanza.body)
+
+    return `-> ${type} ${aggregatedArgs}\n` + encodedBody
+}
+
+// The `---` preceding the MAC is technically part of the MAC-able text
+// so it's included in the header instead
+const mac = (macStr: Uint8Array) =>
+    `${unpaddedBase64(macStr)}`
 
 // parses an AGE encrypted string into a model object with all the
 // relevant parts encoded correctly
@@ -59,6 +77,7 @@ export function readAge(input: string): AgeEncryptionOutput {
         }
 
         identities.push({type, args, body: Buffer.from(body, "base64")})
+        // on the last iteration `current` will be the mac
         current = lines.shift()
     }
 
@@ -80,22 +99,3 @@ export function readAge(input: string): AgeEncryptionOutput {
         body: Buffer.from(ciphertext, "binary")
     }
 }
-
-const recipients = (stanzas: Array<Stanza>) =>
-    stanzas.map(it => recipient(it) + "\n")
-
-const recipient = (stanza: Stanza) => {
-    const type = stanza.type
-    const aggregatedArgs = stanza.args.join(" ")
-    const encodedBody = unpaddedBase64(stanza.body)
-
-    return `-> ${type} ${aggregatedArgs}\n${encodedBody}`
-}
-
-// The `---` preceding the MAC is technically part of the MAC-able text
-// so it's included in the header instead
-const mac = (macStr: Uint8Array) =>
-    `${unpaddedBase64(macStr)}`
-
-const ciphertext = (body: Uint8Array) =>
-    Buffer.from(body).toString("binary")
