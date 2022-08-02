@@ -3,7 +3,7 @@ const footer = "-----END AGE ENCRYPTED FILE-----"
 
 // takes some payload and encodes it as armor with the AGE armor headers in lines of size `chunkSize`
 export function encodeArmor(input: string, chunkSize = 64): string {
-    const base64Input = Buffer.from(input).toString("base64")
+    const base64Input = Buffer.from(input, "binary").toString("base64")
     const columnisedInput = chunked(base64Input, chunkSize).join("\n")
 
     // this case doesn't seem to be possible once base64 encoded, but it's in the spec
@@ -36,7 +36,7 @@ export function decodeArmor(armor: string, chunkSize = 64): string {
         throw Error(`The last line of an armored payload must be less than ${chunkSize} (configurable) to stop padding attacks`)
     }
 
-    return Buffer.from(lines.join(""), "base64").toString("utf8")
+    return Buffer.from(lines.join(""), "base64").toString("binary")
 }
 
 export function isProbablyArmored(input: string): boolean {
