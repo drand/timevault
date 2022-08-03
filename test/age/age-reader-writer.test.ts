@@ -80,7 +80,6 @@ describe("AGE", () => {
                 "-> tlock 2304918 7672797f548f3f4748ac4bf3352fc6c6b6468c9ad40ad456a397545c6e2df5bf\n" +
                 "hjpN1XsAAF1QiYTmfCyo3nPWU5coUxXN/tKvdPIJYO3yUQkF+DwtOaXsuxLZVAYg\n" +
                 "TtaPPedtx5LHNP0Nz4jBONFzz01yPvtp8MUH5xbZS+A\n" +
-                "--- FVEPwakX/J6JUIBAiyfcdxhWFsRreW6ESZXw/F28A/M\n" +
                 "Uw,�ʵ��B0�!w�\\)�x5�D���ezYf�R"
 
             expect(() => readAge(agePayload)).to.throw()
@@ -106,12 +105,28 @@ describe("AGE", () => {
             expect(() => readAge(agePayload)).not.to.throw()
         })
 
-        it("should succeed without recipient params", () => {
-            const agePayload = "-> tlock\n" +
-            "--- FVEPwakX/J6JUIBAiyfcdxhWFsRreW6ESZXw/F28A/M\n" +
-            "Uw,�ʵ��B0�!w�\\)�x5�D���ezYf�R"
+        it("should succeed for recipients with multiple payload lines", () => {
+            const agePayload = "age-encryption.org/v1\n" +
+                "-> tlock 2612487 7672797f548f3f4748ac4bf3352fc6c6b6468c9ad40ad456a397545c6e2df5bf\n" +
+                "hcyRoEtSovbU52hrdg7cp8nNOO2i8Lvlo7mKMtyR3ZvYch9TAGKibeQ7268F6EIZ\n" +
+                "6ScKaEE4Fs3GYDaZsAzzSL56m9nOkbd9XQ3FyQ7rKUq///LGX39XCQR6aTJYez39\n" +
+                "6wfopPUpepadf7KDn4fEbQ\n" +
+                "--- /F2kxRwJKsKNzkOTGswmMaHnWGxGMqsz49Q/5TeGmZg\n" +
+                "/C�ñKË¤rJêÿ;\"c0ï���³��pÕØùl�«À�^M«�"
 
             expect(() => readAge(agePayload)).not.to.throw()
+        })
+
+        it("should fail for recipients with short lines amongst their payload lines", () => {
+            const agePayload = "age-encryption.org/v1\n" +
+                "-> tlock 2612487 7672797f548f3f4748ac4bf3352fc6c6b6468c9ad40ad456a397545c6e2df5bf\n" +
+                "hcyRoEtSovbU52hrdg7cp8nNOO2i8Lvlo7mKMtyR3ZvYch9TAGKibeQ7268F6EIZ\n" +
+                "6wfopPUpepadf7KDn4fEbQ\n" +
+                "6ScKaEE4Fs3GYDaZsAzzSL56m9nOkbd9XQ3FyQ7rKUq///LGX39XCQR6aTJYez39\n" +
+                "--- /F2kxRwJKsKNzkOTGswmMaHnWGxGMqsz49Q/5TeGmZg\n" +
+                "/C�ñKË¤rJêÿ;\"c0ï���³��pÕØùl�«À�^M«�"
+
+            expect(() => readAge(agePayload)).to.throw()
         })
     })
 })
