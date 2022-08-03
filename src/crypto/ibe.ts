@@ -15,7 +15,6 @@ export async function encrypt(master: PointG1, ID: Uint8Array, msg: Uint8Array):
         throw new Error("cannot encrypt messages larger than 2^16-1 bytes.")
     }
 
-
     // 1. Compute Gid = e(master,Q_id)
     const Qid = await bls.PointG2.hashToCurve(ID)
     const Gid = bls.pairing(master, Qid)
@@ -37,6 +36,15 @@ export async function encrypt(master: PointG1, ID: Uint8Array, msg: Uint8Array):
     const hsigma = h4(sigma, msg.length)
 
     const W = xor(msg, hsigma)
+
+    console.log("qid")
+    console.log(Qid.toRawBytes(false))
+    console.log("gid")
+    console.log(fp12ToBytes(Gid))
+    console.log("rGid")
+    console.log(fp12ToBytes(rGid))
+    console.log("hrGid")
+    console.log(hrGid)
 
     return {
         U: U,
@@ -122,9 +130,6 @@ function toField(h3ret: Uint8Array) {
     return n
 }
 
-// maxSize used for our Blake2s XOF output.
-const maxSize = 1 << 10
-
 export function gtToHash(gt: bls.Fp12, len: number): Uint8Array {
     const b2params = {dkLen: 32}
 
@@ -170,15 +175,15 @@ export function fpToBytes(fp: Fp): Uint8Array {
 }
 
 export function fp2ToBytes(fp2: Fp2): Uint8Array {
-    return Buffer.concat(fp2.c.slice().reverse().map(fpToBytes))
+    return Buffer.concat([fp2.c1, fp2.c0].map(fpToBytes))
 }
 
 // fp6 isn't exported by noble... let's take off the rails
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 export function fp6ToBytes(fp6: any): Uint8Array {
-    return Buffer.concat(fp6.c.slice().reverse().map(fp2ToBytes))
+    return Buffer.concat([fp6.c2, fp6.c1, fp6.c0].map(fp2ToBytes))
 }
 
 export function fp12ToBytes(fp12: Fp12): Uint8Array {
-    return Buffer.concat(fp12.c.slice().reverse().map(fp6ToBytes))
+    return Buffer.concat([fp12.c1, fp12.c0].map(fp6ToBytes))
 }

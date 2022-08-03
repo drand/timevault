@@ -6,18 +6,18 @@ import {fp12ToBytes, fp2ToBytes, fpToBytes, gtToHash} from "../src/crypto/ibe"
 describe("fpToBytes", () => {
     it("two Fps should combine into one", () => {
         const combined = Buffer.concat([fpToBytes(new Fp(1n)), fpToBytes(new Fp(2n))])
-        const fp2 = fp2ToBytes(new Fp2([1n, 2n]))
+        const fp2 = fp2ToBytes(Fp2.fromBigTuple([1n, 2n]))
         expect(Buffer.compare(fp2, combined)).to.equal(0)
     })
 
     it("lots of Fp2s should combine to an Fp12", () => {
-        const fullFp12 = fp12ToBytes(Fp12.fromTuple([1n, 2n, 3n, 4n, 5n, 6n, 7n, 8n, 9n, 10n, 11n, 12n]))
-        const one = fp2ToBytes(new Fp2([1n, 2n]))
-        const two = fp2ToBytes(new Fp2([3n, 4n]))
-        const three = fp2ToBytes(new Fp2([5n, 6n]))
-        const four = fp2ToBytes(new Fp2([7n, 8n]))
-        const five = fp2ToBytes(new Fp2([9n, 10n]))
-        const six = fp2ToBytes(new Fp2([11n, 12n]))
+        const fullFp12 = fp12ToBytes(Fp12.fromBigTwelve([1n, 2n, 3n, 4n, 5n, 6n, 7n, 8n, 9n, 10n, 11n, 12n]))
+        const one = fp2ToBytes(Fp2.fromBigTuple([1n, 2n]))
+        const two = fp2ToBytes(Fp2.fromBigTuple([3n, 4n]))
+        const three = fp2ToBytes(Fp2.fromBigTuple([5n, 6n]))
+        const four = fp2ToBytes(Fp2.fromBigTuple([7n, 8n]))
+        const five = fp2ToBytes(Fp2.fromBigTuple([9n, 10n]))
+        const six = fp2ToBytes(Fp2.fromBigTuple([11n, 12n]))
         const combined = Buffer.concat([one, two, three, four, five, six])
 
         expect(Buffer.compare(fullFp12, combined)).to.equal(0)
@@ -34,7 +34,7 @@ describe("fpToBytes", () => {
 
     it("correctly pass the test vectors generated from the go codebase", () => {
         // note these test vectors are the reverse order of the go ones
-        const test = Fp12.fromTuple([
+        const test = Fp12.fromBigTwelve([
             BigInt("0x1250ebd871fc0a92a7b2d83168d0d727272d441befa15c503dd8e90ce98db3e7b6d194f60839c508a84305aaca1789b6"),
             BigInt("0x089a1c5b46e5110b86750ec6a532348868a84045483c92b7af5af689452eafabf1a8943e50439f1d59882a98eaa0170f"),
             BigInt("0x1368bb445c7c2d209703f239689ce34c0378a68e72a6b3b216da0e22a5031b54ddff57309396b38c881c4c849ec23e87"),
@@ -71,6 +71,5 @@ describe("fpToBytes", () => {
         const expectedG2Uncompressed = "13e02b6052719f607dacd3a088274f65596bd0d09920b61ab5da61bbdc7f5049334cf11213945d57e5ac7d055d042b7e024aa2b2f08f0a91260805272dc51051c6e47ad4fa403b02b4510b647ae3d1770bac0326a805bbefd48056c8c121bdb80606c4a02ea734cc32acd2b02bc28b99cb3e287e85a763af267492ab572e99ab3f370d275cec1da1aaa9075ff05f79be0ce5d527727d6e118cc9cdc6da2e351aadfd9baa8cbdd3a76d429a695160d12c923ac9cc3baca289e193548608b82801"
         const actualG2Uncompressed = Buffer.from(bls.PointG2.BASE.toRawBytes(false)).toString("hex")
         expect(actualG2Uncompressed).to.equal(expectedG2Uncompressed)
-
     })
 })
