@@ -5,7 +5,7 @@ const webFormSchema = yup.object({
     ciphertext: yup.string().nullable(true).optional(),
     decryptionTime: yup.number()
         .positive()
-        .moreThan(Date.now(), "Decryption time must be in the future!")
+        // .moreThan(Date.now(), "Decryption time must be in the future!")
         .required()
 }).required()
 
