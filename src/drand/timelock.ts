@@ -1,6 +1,9 @@
 import {defaultClientInfo, DrandClient, DrandNetworkInfo, DrandHttpClient} from "./drand-client"
 import {decryptAge, encryptAge, Stanza} from "../age/age-encrypt-decrypt"
 import {encodeArmor, decodeArmor, isProbablyArmored} from "../age/armor"
+import * as ibe from "../crypto/ibe"
+import {PointG1} from "@noble/bls12-381"
+import {sha256} from "@noble/hashes/sha256"
 
 export async function timelockEncrypt(
     config: DrandNetworkInfo,
@@ -8,7 +11,7 @@ export async function timelockEncrypt(
     payload: string,
     drandHttpClient: DrandClient = DrandHttpClient.createFetchClient(),
 ): Promise<string> {
-    const timelockEncrypter = createTimelockEncrypter(drandHttpClient, roundNumber)
+    const timelockEncrypter = createTimelockEncrypter(defaultClientInfo, drandHttpClient, roundNumber)
     const agePayload = await encryptAge(Buffer.from(payload), timelockEncrypter)
     return encodeArmor(agePayload)
 }
@@ -29,18 +32,24 @@ export async function timelockDecrypt(
 
 const timelockTypeName = "tlock"
 
-export function createTimelockEncrypter(network: DrandClient, roundNumber: number) {
+export function createTimelockEncrypter(chainInfo: DrandNetworkInfo, network: DrandClient, roundNumber: number) {
     if (roundNumber < 1) {
         throw Error("You cannot encrypt for a roundNumber less than 1 (genesis = 0)")
     }
 
     return async (filekey: Uint8Array): Promise<Array<Stanza>> => {
         // probably should get chainHash through /info
+        const point = PointG1.fromHex(chainInfo.publicKey)
+        const roundNumberBuffer = Buffer.alloc(8)
+        roundNumberBuffer.writeBigUInt64BE(BigInt(roundNumber))
+        const id = sha256(roundNumberBuffer)
+        const ciphertext = await ibe.encrypt(point, id, filekey)
+        const body = Buffer.concat([ciphertext.U.toRawBytes(true), ciphertext.V, ciphertext.W])
 
         return [{
             type: timelockTypeName,
             args: [`${roundNumber}`, defaultClientInfo.chainHash],
-            body: filekey
+            body
         }]
     }
 }

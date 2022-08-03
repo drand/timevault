@@ -1,6 +1,7 @@
 import {Fp, Fp2, Fp12} from '@noble/bls12-381'
 import {expect} from "chai"
 import {fp12ToBytes, fp2ToBytes, fpToBytes} from "../src/crypto/ibe"
+import { blake2s } from '@noble/hashes/blake2s';
 
 describe("fpToBytes", () => {
     it("two Fps should combine into one", () => {
