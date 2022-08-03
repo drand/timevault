@@ -84,7 +84,7 @@ function xor(a: Uint8Array, b: Uint8Array): Uint8Array {
 }
 
 
-////// code from Noble: 
+////// code from Noble:
 ////// https://github.com/paulmillr/noble-bls12-381/blob/6380415f1b7e5078c8883a5d8d687f2dd3bff6c2/index.ts#L132-L145
 function bytesToNumberBE(uint8a: Uint8Array): bigint {
     return BigInt('0x' + bytesToHex(Uint8Array.from(uint8a)))
@@ -125,7 +125,7 @@ function toField(h3ret: Uint8Array) {
 // maxSize used for our Blake2s XOF output.
 const maxSize = 1 << 10
 
-function gtToHash(gt: bls.Fp12, len: number): Uint8Array {
+export function gtToHash(gt: bls.Fp12, len: number): Uint8Array {
     const b2params = {dkLen: 32}
 
     return blake2s
@@ -133,8 +133,7 @@ function gtToHash(gt: bls.Fp12, len: number): Uint8Array {
         .update("IBE-H2")
         .update(fp12ToBytes(gt))
         .digest()
-    //
-    // return hgtret.slice(0, len)
+        .slice(0, len)
 }
 
 function h3(sigma: Uint8Array, msg: Uint8Array) {
@@ -171,15 +170,15 @@ export function fpToBytes(fp: Fp): Uint8Array {
 }
 
 export function fp2ToBytes(fp2: Fp2): Uint8Array {
-    return Buffer.concat(fp2.c.map(fpToBytes))
+    return Buffer.concat(fp2.c.slice().reverse().map(fpToBytes))
 }
 
 // fp6 isn't exported by noble... let's take off the rails
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 export function fp6ToBytes(fp6: any): Uint8Array {
-    return Buffer.concat(fp6.c.map(fp2ToBytes))
+    return Buffer.concat(fp6.c.slice().reverse().map(fp2ToBytes))
 }
 
 export function fp12ToBytes(fp12: Fp12): Uint8Array {
-    return Buffer.concat(fp12.c.map(fp6ToBytes))
+    return Buffer.concat(fp12.c.slice().reverse().map(fp6ToBytes))
 }

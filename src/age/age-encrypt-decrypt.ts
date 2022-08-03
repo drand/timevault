@@ -23,8 +23,9 @@ export type Stanza = {
 const ageVersion = "age-encryption.org/v1"
 const hkdfHeaderMessage = "header"
 const hkdfBodyMessage = Buffer.from("payload", "utf8")
-const filekeyLengthBits = 32
-const bodyHkdfNonceLengthBits = 16
+const filekeyLengthBytes = 16
+const bodyHkdfNonceLengthBytes = 16
+const hkdfKeyLengthBytes = 32
 
 // encrypts a plaintext payload using AGE by generating a filekey
 // and passing the filekey to another encryption wrapper for handling
@@ -32,7 +33,7 @@ export async function encryptAge(
     plaintext: Uint8Array,
     wrapFileKey: EncryptionWrapper = NoOpEncdec.wrap
 ): Promise<string> {
-    const fileKey = await random(filekeyLengthBits)
+    const fileKey = await random(filekeyLengthBytes)
     const recipients = await wrapFileKey(fileKey)
     const body = await encryptedPayload(fileKey, plaintext)
 
@@ -47,8 +48,8 @@ export async function encryptAge(
 }
 
 async function encryptedPayload(fileKey: Uint8Array, payload: Uint8Array): Promise<Buffer> {
-    const nonce = await random(bodyHkdfNonceLengthBits)
-    const hkdfKey = hkdf(sha256, fileKey, nonce, hkdfBodyMessage, 32)
+    const nonce = await random(bodyHkdfNonceLengthBytes)
+    const hkdfKey = hkdf(sha256, fileKey, nonce, hkdfBodyMessage, hkdfKeyLengthBytes)
     const ciphertext = STREAM.seal(payload, hkdfKey)
     return Buffer.concat([nonce, ciphertext])
 }
@@ -75,9 +76,9 @@ export async function decryptAge(
         throw Error("The MAC did not validate for the filekey and payload!")
     }
 
-    const nonce = Buffer.from(encryptedPayload.body.slice(0, bodyHkdfNonceLengthBits))
-    const cipherText = encryptedPayload.body.slice(bodyHkdfNonceLengthBits)
-    const hkdfKey = hkdf(sha256, fileKey, nonce, hkdfBodyMessage, 32)
+    const nonce = Buffer.from(encryptedPayload.body.slice(0, bodyHkdfNonceLengthBytes))
+    const cipherText = encryptedPayload.body.slice(bodyHkdfNonceLengthBytes)
+    const hkdfKey = hkdf(sha256, fileKey, nonce, hkdfBodyMessage, hkdfKeyLengthBytes)
 
     return Buffer.from(STREAM.open(cipherText, hkdfKey)).toString("utf8")
 }

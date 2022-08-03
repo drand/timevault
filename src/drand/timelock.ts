@@ -1,9 +1,9 @@
 import {defaultClientInfo, DrandClient, DrandNetworkInfo, DrandHttpClient} from "./drand-client"
 import {decryptAge, encryptAge, Stanza} from "../age/age-encrypt-decrypt"
 import {encodeArmor, decodeArmor, isProbablyArmored} from "../age/armor"
-import * as ibe from "../crypto/ibe"
 import {PointG1} from "@noble/bls12-381"
 import {sha256} from "@noble/hashes/sha256"
+import * as ibe from "../crypto/ibe"
 
 export async function timelockEncrypt(
     config: DrandNetworkInfo,

@@ -15,7 +15,7 @@ describe("timelock", () => {
             await expect(timelockEncrypt(defaultClientInfo, -1, "hello world")).to.be.rejectedWith()
         })
         it("should pass for a valid roundNumber", async () => {
-            await expect(timelockEncrypt(defaultClientInfo, -1, "hello world")).to.rejectedWith()
+            await expect(timelockEncrypt(defaultClientInfo, 1, "hello world")).not.to.be.rejectedWith()
         })
     })
 

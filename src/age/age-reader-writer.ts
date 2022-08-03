@@ -80,7 +80,7 @@ export function readAge(input: string): AgeEncryptionOutput {
         header: {
             version,
             recipients: identities,
-            mac: unpaddedBase64Buffer(mac)
+            mac: Buffer.from(mac, "base64")
         },
         body: Buffer.from(ciphertext, "binary")
     }
@@ -93,6 +93,8 @@ function parseRecipients(lines: Array<string>): Array<Stanza> {
 
     for (let current = peek(lines); current != null && current.startsWith("->"); current = peek(lines)) {
         const [type, ...args] = current.slice(3, current.length).split(" ")
+        lines.shift()
+
         const body = parseRecipientBody(lines)
         if (!body) {
             throw Error(`expected stanza '${type} to have a body, but it didn't`)
