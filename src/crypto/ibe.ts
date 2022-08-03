@@ -1,7 +1,6 @@
 import * as bls from "@noble/bls12-381"
 import {Fp, Fp2, Fp12, PointG1, PointG2, utils} from "@noble/bls12-381"
 import {sha256} from "@noble/hashes/sha256"
-import {blake2s} from "@noble/hashes/blake2s"
 
 export interface Ciphertext {
     U: PointG1
@@ -71,6 +70,12 @@ export async function decrypt(p: PointG2, c: Ciphertext): Promise<Uint8Array> {
     // 	3. Check U = rP
     const r = h3(sigma, msg)
     const rP = bls.PointG1.BASE.multiply(r)
+    console.log("gidt")
+    console.log(fp12ToBytes(gidt))
+    console.log("hrGid")
+    console.log(hgidt)
+    console.log("msg")
+    console.log(msg)
     if (!rP.equals(c.U)) {
         throw new Error("invalid proof: rP check failed")
     }
@@ -131,10 +136,8 @@ function toField(h3ret: Uint8Array) {
 }
 
 export function gtToHash(gt: bls.Fp12, len: number): Uint8Array {
-    const b2params = {dkLen: 32}
-
-    return blake2s
-        .create(b2params)
+    return sha256
+        .create()
         .update("IBE-H2")
         .update(fp12ToBytes(gt))
         .digest()
@@ -142,9 +145,8 @@ export function gtToHash(gt: bls.Fp12, len: number): Uint8Array {
 }
 
 function h3(sigma: Uint8Array, msg: Uint8Array) {
-    const b2params = {dkLen: 32}
-    const h3ret = blake2s
-        .create(b2params)
+    const h3ret = sha256
+        .create()
         .update("IBE-H3")
         .update(sigma)
         .update(msg)
@@ -154,10 +156,8 @@ function h3(sigma: Uint8Array, msg: Uint8Array) {
 }
 
 function h4(sigma: Uint8Array, len: number): Uint8Array {
-    const b2params = {dkLen: 32}
-
-    const h4sigma = blake2s
-        .create(b2params)
+    const h4sigma = sha256
+        .create()
         .update("IBE-H4")
         .update(sigma)
         .digest()

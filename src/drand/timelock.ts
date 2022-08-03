@@ -12,9 +12,6 @@ export async function timelockEncrypt(
     payload: string,
     drandHttpClient: DrandClient = DrandHttpClient.createFetchClient(),
 ): Promise<string> {
-
-    roundNumber = 1
-
     const timelockEncrypter = createTimelockEncrypter(defaultClientInfo, drandHttpClient, roundNumber)
     const agePayload = await encryptAge(Buffer.from(payload), timelockEncrypter)
     return encodeArmor(agePayload)
