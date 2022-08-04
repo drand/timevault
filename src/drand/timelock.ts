@@ -1,9 +1,10 @@
 import {defaultClientInfo, DrandClient, DrandNetworkInfo, DrandHttpClient} from "./drand-client"
 import {decryptAge, encryptAge, Stanza} from "../age/age-encrypt-decrypt"
 import {encodeArmor, decodeArmor, isProbablyArmored} from "../age/armor"
-import {PointG1} from "@noble/bls12-381"
+import {PointG1, PointG2} from "@noble/bls12-381"
 import {sha256} from "@noble/hashes/sha256"
 import * as ibe from "../crypto/ibe"
+import {Ciphertext} from "../crypto/ibe"
 
 export async function timelockEncrypt(
     config: DrandNetworkInfo,
@@ -82,6 +83,21 @@ export function createTimelockDecrypter(network: DrandClient) {
         const beacon = await network.get(roundNumberParsed)
         console.log(`beacon received: ${JSON.stringify(beacon)}`)
 
-        return body
+        const g2 = PointG2.fromHex(beacon.signature)
+        const ciphertext = parseCiphertext(body)
+        return await ibe.decrypt(g2, ciphertext)
     }
+}
+
+function parseCiphertext(body: Uint8Array): Ciphertext {
+    const g1Length = PointG1.BASE.toRawBytes(true).byteLength
+    const g1Bytes = body.subarray(0, g1Length)
+    const theRest = body.subarray(g1Length)
+    const eachHalf = theRest.length / 2
+
+    const U = PointG1.fromHex(Buffer.from(g1Bytes).toString("hex"))
+    const V = theRest.subarray(0, eachHalf)
+    const W = theRest.subarray(eachHalf)
+
+    return {U, V, W}
 }
