@@ -1,6 +1,5 @@
-import {createMacKey} from "./hmac"
-import {unpaddedBase64, unpaddedBase64Buffer} from "./util"
-import {chunked} from "./chunked"
+import {chunked, unpaddedBase64} from "./utils"
+import {createMacKey} from "./utils-crypto"
 
 type Stanza = {
     type: string,
@@ -64,7 +63,7 @@ const mac = (macStr: Uint8Array) => unpaddedBase64(macStr)
 export function readAge(input: string): AgeEncryptionOutput {
     const [version, ...lines] = input.split("\n")
 
-    const identities = parseRecipients(lines)
+    const recipients = parseRecipients(lines)
 
     const macStartingTag = "--- "
     const macLine = lines.shift()
@@ -72,17 +71,12 @@ export function readAge(input: string): AgeEncryptionOutput {
         throw Error("Expected mac, but there were no more lines left!")
     }
 
-    // mac cannot be validated yet, as we don't have the filekey
-    const mac = macLine.slice(macStartingTag.length, macLine.length)
-    const ciphertext = lines.join("") ?? ""
+    const mac = Buffer.from(macLine.slice(macStartingTag.length, macLine.length), "base64")
+    const ciphertext = Buffer.from(lines.join("") ?? "", "binary")
 
     return {
-        header: {
-            version,
-            recipients: identities,
-            mac: Buffer.from(mac, "base64")
-        },
-        body: Buffer.from(ciphertext, "binary")
+        header: {version, recipients, mac},
+        body: ciphertext
     }
 }
 

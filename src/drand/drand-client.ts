@@ -88,7 +88,7 @@ class DrandHttpClient implements DrandClient {
 }
 
 async function verifyBeacon(round: number, signature: string, publicKey: string): Promise<boolean> {
-    const buffer = Buffer.alloc(8)
+    const buffer = Buffer.alloc(64 / 8)
     buffer.writeBigUInt64BE(BigInt(round))
     const message = await bls.utils.sha256(buffer)
     return await bls.verify(signature, message, publicKey)

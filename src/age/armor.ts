@@ -1,4 +1,4 @@
-import {chunked} from "./chunked"
+import {chunked} from "./utils"
 
 const header = "-----BEGIN AGE ENCRYPTED FILE-----"
 const footer = "-----END AGE ENCRYPTED FILE-----"
@@ -8,7 +8,7 @@ export function encodeArmor(input: string, chunkSize = 64): string {
     const base64Input = Buffer.from(input, "binary").toString("base64")
     const columnisedInput = chunked(base64Input, chunkSize).join("\n")
 
-    // this case doesn't seem to be possible once base64 encoded, but it's in the spec
+    // if the last line is exactly 64 columns, add an extra newline
     let paddedFooter = footer
     if (columnisedInput.length > 0 && columnisedInput[columnisedInput.length - 1].length === 64) {
         paddedFooter = "\n" + footer
@@ -19,12 +19,14 @@ export function encodeArmor(input: string, chunkSize = 64): string {
 // takes an armored payload and decodes it if it is an AGE armor payload
 // and it satisfies some security properties
 export function decodeArmor(armor: string, chunkSize = 64): string {
+    // could start/end with space or newlines, let's strip them
     armor = armor.trim()
+
     if (!armor.startsWith(header)) {
         throw Error(`Armor cannot be decoded if it does not start with a header! i.e. ${header}`)
     }
-    // could end in a newline, let's strip it
-    if (!armor.trimEnd().endsWith(footer)) {
+
+    if (!armor.endsWith(footer)) {
         throw Error(`Armor cannot be decoded if it does not end with a footer! i.e. ${footer}`)
     }
 
@@ -38,10 +40,9 @@ export function decodeArmor(armor: string, chunkSize = 64): string {
         throw Error(`The last line of an armored payload must be less than ${chunkSize} (configurable) to stop padding attacks`)
     }
 
-    return Buffer.from(lines.join(""), "base64").toString("binary")
+    return Buffer.from(base64Payload, "base64").toString("binary")
 }
 
 export function isProbablyArmored(input: string): boolean {
     return input.startsWith(header)
 }
-

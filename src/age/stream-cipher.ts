@@ -7,10 +7,10 @@
 // After the header the binary payload is nonce || STREAM[HKDF[nonce, "payload"](file key)](plaintext) where nonce is random(16) and STREAM is from Online Authenticated-Encryption and its Nonce-Reuse Misuse-Resistance with ChaCha20-Poly1305 in 64KiB chunks and a nonce structure of 11 bytes of big endian counter, and 1 byte of last block flag (0x00 / 0x01). (The STREAM scheme is similar to the one Tink and Miscreant use, but without nonce prefix as we use HKDF, and with ChaCha20-Poly1305 instead of AES-GCM because the latter is unreasonably hard to do well or fast without hardware support.)
 import {ChaCha20Poly1305} from "@stablelib/chacha20poly1305"
 
-const CHUNK_SIZE = 64 * 1024; // 64 KiB
-const TAG_SIZE = 16; // Poly1305 MAC size
+const CHUNK_SIZE = 64 * 1024 // 64 KiB
+const TAG_SIZE = 16 // Poly1305 MAC size
 const ENCRYPTED_CHUNK_SIZE = CHUNK_SIZE + TAG_SIZE
-const NONCE_SIZE = 12; // STREAM nonce size
+const NONCE_SIZE = 12 // STREAM nonce size
 
 type ui8a = Uint8Array
 
@@ -32,7 +32,7 @@ export class STREAM {
         return ciphertext
     }
 
-    static open(ciphertext: ui8a, privateKey: ui8a) {
+    static open(ciphertext: ui8a, privateKey: ui8a): Uint8Array {
         const stream = new STREAM(privateKey)
         const chunks = Math.ceil(ciphertext.length / ENCRYPTED_CHUNK_SIZE)
         const plaintext = new Uint8Array(ciphertext.length - (chunks * TAG_SIZE))
