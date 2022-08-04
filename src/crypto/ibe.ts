@@ -26,7 +26,7 @@ export async function encrypt(master: PointG1, ID: Uint8Array, msg: Uint8Array):
     const U = bls.PointG1.BASE.multiply(r)
 
     // 5. Compute V = sigma XOR H2(rGid)
-    const rGid = Gid.multiply(r)
+    const rGid = Gid.pow(r)
     const hrGid = await gtToHash(rGid, msg.length)
 
     const V = xor(sigma, hrGid)
@@ -35,15 +35,6 @@ export async function encrypt(master: PointG1, ID: Uint8Array, msg: Uint8Array):
     const hsigma = h4(sigma, msg.length)
 
     const W = xor(msg, hsigma)
-
-    console.log("qid")
-    console.log(Qid.toRawBytes(false))
-    console.log("gid")
-    console.log(fp12ToBytes(Gid))
-    console.log("rGid")
-    console.log(fp12ToBytes(rGid))
-    console.log("hrGid")
-    console.log(hrGid)
 
     return {
         U: U,
@@ -70,12 +61,7 @@ export async function decrypt(p: PointG2, c: Ciphertext): Promise<Uint8Array> {
     // 	3. Check U = rP
     const r = h3(sigma, msg)
     const rP = bls.PointG1.BASE.multiply(r)
-    console.log("gidt")
-    console.log(fp12ToBytes(gidt))
-    console.log("hrGid")
-    console.log(hgidt)
-    console.log("msg")
-    console.log(msg)
+
     if (!rP.equals(c.U)) {
         throw new Error("invalid proof: rP check failed")
     }
