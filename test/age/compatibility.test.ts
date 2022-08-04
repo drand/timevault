@@ -3,7 +3,8 @@ import {expect} from "chai"
 import {timelockDecrypt} from "../../src/drand/timelock"
 import {MockDrandClient} from "./mock-drand-client"
 
-test("payloads encrypted with the go impl should decrypt successfully", async () => {
+// needs reenabled once the `toField` impl in go is corrected
+test.skip("payloads encrypted with the go impl should decrypt successfully", async () => {
     const validBeacon = {
         round: 2627830,
         randomness: "d6d843144ce19f63318048f2715cc17298ae6f2dfe982705c2e41a9f63e63b04",

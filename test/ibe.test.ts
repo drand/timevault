@@ -1,7 +1,9 @@
 import * as bls from "@noble/bls12-381"
 import {Fp, Fp2, Fp12} from "@noble/bls12-381"
 import {expect} from "chai"
-import {fp12ToBytes, fp2ToBytes, fpToBytes, gtToHash} from "../src/crypto/ibe"
+import {encrypt, fp12ToBytes, fp2ToBytes, fpToBytes, gtToHash, toField} from "../src/crypto/ibe"
+import {timelockEncrypt} from "../src/drand/timelock"
+import {defaultClientInfo, DrandHttpClient} from "../src/drand/drand-client"
 
 describe("fpToBytes", () => {
     it("two Fps should combine into one", () => {

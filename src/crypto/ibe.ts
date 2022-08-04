@@ -107,13 +107,13 @@ function bytesToHex(uint8a: Uint8Array): string {
 const BitsToMaskForBLS12381 = 1
 
 // we are hashing the data until we get a value smaller than the curve order
-function toField(h3ret: Uint8Array) {
+export function toField(h3ret: Uint8Array) {
     let data = h3ret
     // assuming Big Endianness
-    data[0] = data[0] >> BitsToMaskForBLS12381
     let n: bigint = bytesToNumberBE(data)
     while (n <= 0 || n > bls.CURVE.r) {
         data = sha256(data)
+        // assuming Big Endianness
         data[0] = data[0] >> BitsToMaskForBLS12381
         n = bytesToNumberBE(data)
     }
