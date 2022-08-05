@@ -1,5 +1,6 @@
-import {chunked, unpaddedBase64} from "./utils"
+import {chunked, sliceUntil, unpaddedBase64} from "./utils"
 import {createMacKey} from "./utils-crypto"
+import internal from "stream"
 
 type Stanza = {
     type: string,
@@ -72,7 +73,9 @@ export function readAge(input: string): AgeEncryptionOutput {
     }
 
     const mac = Buffer.from(macLine.slice(macStartingTag.length, macLine.length), "base64")
-    const ciphertext = Buffer.from(lines.join("") ?? "", "binary")
+
+    // any remaining newlines are actually part of the payload
+    const ciphertext = Buffer.from(lines.join("\n") ?? "", "binary")
 
     return {
         header: {version, recipients, mac},
