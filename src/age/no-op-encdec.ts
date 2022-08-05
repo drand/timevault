@@ -2,7 +2,9 @@ import {Stanza} from "./age-encrypt-decrypt"
 
 const noOpType = "no-op"
 
-class NoOpEncdec {
+// if you wish to encrypt with AGE but simply pass the filekey in the recipient stanza, then use this
+// protip: you probably don't!
+class NoOpEncDec {
     static async wrap(filekey: Uint8Array): Promise<Array<Stanza>> {
         return [{
             type: noOpType,
@@ -24,4 +26,4 @@ class NoOpEncdec {
     }
 }
 
-export {NoOpEncdec}
+export {NoOpEncDec}

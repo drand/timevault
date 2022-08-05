@@ -1,12 +1,10 @@
-import {STREAM} from "./stream-cipher"
-import {random} from "./random"
-import {NoOpEncdec} from "./no-op-encdec"
-import {readAge, writeAge} from "./age-reader-writer"
-import {createMacKey} from "./hmac"
-import {unpaddedBase64, unpaddedBase64Buffer} from "./util"
 import {hkdf} from "@noble/hashes/hkdf"
 import {sha256} from "@noble/hashes/sha256"
-import {encodeArmor} from "./armor"
+import {STREAM} from "./stream-cipher"
+import {NoOpEncDec} from "./no-op-encdec"
+import {readAge, writeAge} from "./age-reader-writer"
+import {sliceUntil, unpaddedBase64Buffer} from "./utils"
+import {createMacKey, random} from "./utils-crypto"
 
 type FileKey = Uint8Array
 type EncryptionWrapper = (fileKey: FileKey) => Promise<Array<Stanza>>
@@ -21,19 +19,19 @@ export type Stanza = {
 }
 
 const ageVersion = "age-encryption.org/v1"
-const hkdfHeaderMessage = "header"
-const hkdfBodyMessage = Buffer.from("payload", "utf8")
-const filekeyLengthBytes = 16
+const headerMacMessage = "header" // some plaintext used to generate the mac
+const hkdfBodyMessage = "payload" // some plaintext used for generating the key for encrypting the body
+const fileKeyLengthBytes = 16
 const bodyHkdfNonceLengthBytes = 16
 const hkdfKeyLengthBytes = 32
 
-// encrypts a plaintext payload using AGE by generating a filekey
-// and passing the filekey to another encryption wrapper for handling
+// encrypts a plaintext payload using AGE by generating a fileKey
+// and passing the fileKey to another `EncryptionWrapper` for handling
 export async function encryptAge(
     plaintext: Uint8Array,
-    wrapFileKey: EncryptionWrapper = NoOpEncdec.wrap
+    wrapFileKey: EncryptionWrapper = NoOpEncDec.wrap
 ): Promise<string> {
-    const fileKey = await random(filekeyLengthBytes)
+    const fileKey = await random(fileKeyLengthBytes)
     const recipients = await wrapFileKey(fileKey)
     const body = await encryptedPayload(fileKey, plaintext)
 
@@ -41,7 +39,7 @@ export async function encryptAge(
             fileKey,
             version: ageVersion,
             recipients,
-            headerMacMessage: hkdfHeaderMessage,
+            headerMacMessage,
             body
         }
     )
@@ -49,17 +47,17 @@ export async function encryptAge(
 
 async function encryptedPayload(fileKey: Uint8Array, payload: Uint8Array): Promise<Buffer> {
     const nonce = await random(bodyHkdfNonceLengthBytes)
-    const hkdfKey = hkdf(sha256, fileKey, nonce, hkdfBodyMessage, hkdfKeyLengthBytes)
+    const hkdfKey = hkdf(sha256, fileKey, nonce, Buffer.from(hkdfBodyMessage, "utf8"), hkdfKeyLengthBytes)
     const ciphertext = STREAM.seal(payload, hkdfKey)
     return Buffer.concat([nonce, ciphertext])
 }
 
-// decrypts a payload that has been encrypted using AGE
-// can unwrap any internal encryption by passing recipients who can
-// provide the `filekey` created during encryption
+// decrypts a payload that has been encrypted using AGE can unwrap
+// any internal encryption by passing a `DecryptionWrapper` that can
+// provide the `fileKey` created during encryption
 export async function decryptAge(
     payload: string,
-    unwrapFileKey: DecryptionWrapper = NoOpEncdec.unwrap
+    unwrapFileKey: DecryptionWrapper = NoOpEncDec.unwrap
 ): Promise<string> {
     const encryptedPayload = readAge(payload)
     const version = encryptedPayload.header.version
@@ -69,39 +67,17 @@ export async function decryptAge(
 
     const fileKey = await unwrapFileKey(encryptedPayload.header.recipients)
     const header = sliceUntil(payload, "---")
-    const expectedMac = unpaddedBase64Buffer(createMacKey(fileKey, hkdfHeaderMessage, header))
+    const expectedMac = unpaddedBase64Buffer(createMacKey(fileKey, headerMacMessage, header))
     const actualMac = encryptedPayload.header.mac
 
     if (Buffer.compare(actualMac, expectedMac) !== 0) {
-        throw Error("The MAC did not validate for the filekey and payload!")
+        throw Error("The MAC did not validate for the fileKey and payload!")
     }
 
     const nonce = Buffer.from(encryptedPayload.body.slice(0, bodyHkdfNonceLengthBytes))
     const cipherText = encryptedPayload.body.slice(bodyHkdfNonceLengthBytes)
-    const hkdfKey = hkdf(sha256, fileKey, nonce, hkdfBodyMessage, hkdfKeyLengthBytes)
+    const hkdfKey = hkdf(sha256, fileKey, nonce, Buffer.from(hkdfBodyMessage, "utf8"), hkdfKeyLengthBytes)
 
-    return Buffer.from(STREAM.open(cipherText, hkdfKey)).toString("utf8")
-}
-
-// slices the input string up to and including the first
-// occurrence of the string provided in `searchTerm`
-// returns the whole string if it's not found
-// e.g. sliceUntil("hello world", "ll") will return "hell"
-function sliceUntil(input: string, searchTerm: string) {
-    let lettersMatched = 0
-    let inputPointer = 0
-
-    while (inputPointer < input.length && lettersMatched < searchTerm.length) {
-        if (input[inputPointer] === searchTerm[lettersMatched]) {
-            ++lettersMatched
-        } else if (input[inputPointer] === searchTerm[0]) {
-            lettersMatched = 1
-        } else {
-            lettersMatched = 0
-        }
-
-        ++inputPointer
-    }
-
-    return input.slice(0, inputPointer)
+    const plaintext = STREAM.open(cipherText, hkdfKey)
+    return Buffer.from(plaintext).toString("utf8")
 }

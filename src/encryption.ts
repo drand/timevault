@@ -15,7 +15,7 @@ export async function encryptedOrDecryptedFormData(form: unknown): Promise<Compl
         return decrypt(partialWebForm.ciphertext, partialWebForm.decryptionTime)
     }
 
-    return Promise.reject("Neither plaintext nor partialtext were input")
+    return Promise.reject("Neither plaintext nor ciphertext were input")
 }
 
 async function encrypt(plaintext: string, decryptionTime: number): Promise<CompletedWebForm> {
@@ -35,4 +35,3 @@ async function decrypt(ciphertext: string, decryptionTime: number): Promise<Comp
         ciphertext,
     }
 }
-

@@ -1,6 +1,6 @@
 import {expect} from "chai"
-import {random} from "../../src/age/random"
 import {readAge, writeAge} from "../../src/age/age-reader-writer"
+import {random} from "../../src/age/utils-crypto"
 
 describe("AGE", () => {
     describe("writer", async () => {

@@ -1,6 +1,7 @@
 import * as bls from "@noble/bls12-381"
-import {Fp, Fp2, Fp12, PointG1, PointG2, utils} from "@noble/bls12-381"
+import {PointG1, PointG2, utils} from "@noble/bls12-381"
 import {sha256} from "@noble/hashes/sha256"
+import {bytesToNumberBE, fp12ToBytes, xor} from "./utils"
 
 export interface Ciphertext {
     U: PointG1
@@ -65,60 +66,8 @@ export async function decrypt(p: PointG2, c: Ciphertext): Promise<Uint8Array> {
     if (!rP.equals(c.U)) {
         throw new Error("invalid proof: rP check failed")
     }
+
     return msg
-}
-
-function xor(a: Uint8Array, b: Uint8Array): Uint8Array {
-    if (a.length != b.length) {
-        throw new Error("Error: incompatible sizes")
-    }
-
-    const ret = new Uint8Array(a.length)
-
-    for (let i = 0; i < a.length; i++) {
-        ret[i] = a[i] ^ b[i]
-    }
-
-    return ret
-}
-
-
-////// code from Noble:
-////// https://github.com/paulmillr/noble-bls12-381/blob/6380415f1b7e5078c8883a5d8d687f2dd3bff6c2/index.ts#L132-L145
-function bytesToNumberBE(uint8a: Uint8Array): bigint {
-    return BigInt('0x' + bytesToHex(Uint8Array.from(uint8a)))
-}
-
-const hexes = Array.from({length: 256}, (v, i) => i.toString(16).padStart(2, '0'))
-
-function bytesToHex(uint8a: Uint8Array): string {
-// pre-caching chars could speed this up 6x.
-    let hex = ''
-    for (let i = 0; i < uint8a.length; i++) {
-        hex += hexes[uint8a[i]]
-    }
-    return hex
-}
-
-////// end of code from Noble.
-
-
-// Our IBE hashes
-const BitsToMaskForBLS12381 = 1
-
-// we are hashing the data until we get a value smaller than the curve order
-export function toField(h3ret: Uint8Array) {
-    let data = h3ret
-    // assuming Big Endianness
-    let n: bigint = bytesToNumberBE(data)
-    while (n <= 0 || n > bls.CURVE.r) {
-        data = sha256(data)
-        // assuming Big Endianness
-        data[0] = data[0] >> BitsToMaskForBLS12381
-        n = bytesToNumberBE(data)
-    }
-
-    return n
 }
 
 export function gtToHash(gt: bls.Fp12, len: number): Uint8Array {
@@ -151,25 +100,20 @@ function h4(sigma: Uint8Array, len: number): Uint8Array {
     return h4sigma.slice(0, len)
 }
 
-// Function to convert Noble's FPs to byte arrays compatible with Kilic library.
-export function fpToBytes(fp: Fp): Uint8Array {
-    // 48 bytes = 96 hex bytes
-    const hex = BigInt(fp.value).toString(16).padStart(96, "0")
-    const buf = Buffer.alloc(hex.length / 2)
-    buf.write(hex, "hex")
-    return buf
-}
+// Our IBE hashes
+const BitsToMaskForBLS12381 = 1
 
-export function fp2ToBytes(fp2: Fp2): Uint8Array {
-    return Buffer.concat([fp2.c1, fp2.c0].map(fpToBytes))
-}
+// we are hashing the data until we get a value smaller than the curve order
+export function toField(h3ret: Uint8Array) {
+    let data = h3ret
+    // assuming Big Endianness
+    let n: bigint = bytesToNumberBE(data)
+    while (n <= 0 || n > bls.CURVE.r) {
+        data = sha256(data)
+        // assuming Big Endianness
+        data[0] = data[0] >> BitsToMaskForBLS12381
+        n = bytesToNumberBE(data)
+    }
 
-// fp6 isn't exported by noble... let's take off the rails
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
-export function fp6ToBytes(fp6: any): Uint8Array {
-    return Buffer.concat([fp6.c2, fp6.c1, fp6.c0].map(fp2ToBytes))
-}
-
-export function fp12ToBytes(fp12: Fp12): Uint8Array {
-    return Buffer.concat([fp12.c1, fp12.c0].map(fp6ToBytes))
+    return n
 }
