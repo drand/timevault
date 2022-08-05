@@ -1,0 +1,31 @@
+@import "~bootstrap/scss/bootstrap";
+
+$primary-color: rgba(0, 70, 249, 255);
+$secondary-color: rgb(37, 150, 190);
+$background-color: rgb(7, 9, 21);
+$background-lighter: rgba(21, 23, 34, 0.99);
+$input-color: rgba(46, 48, 59, 255);
+$highlight-color: rgba(255, 255, 255, 255);
+$warning-color: rgba(255, 0, 0, 255);
+
+html, body {
+  font-family: arial, serif;
+  background-color: $background-color;
+  color: $highlight-color;
+}
+
+input, textarea {
+  background-color: $input-color !important;
+  color: $highlight-color !important;
+}
+
+.light-bg {
+  background-color: $background-lighter;
+}
+
+#errors {
+  width: 100%;
+  height: 2em;
+  color: $warning-color;
+  text-align: center;
+}
