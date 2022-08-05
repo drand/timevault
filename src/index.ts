@@ -1,5 +1,4 @@
 import {CompletedWebForm, encryptedOrDecryptedFormData} from "./encryption"
-
 const plaintextElement = document.getElementById("plaintext") as HTMLTextAreaElement
 const ciphertextElement = document.getElementById("ciphertext") as HTMLTextAreaElement
 const timeElement = document.getElementById("time") as HTMLInputElement
@@ -37,9 +36,14 @@ function render(output: CompletedWebForm) {
     renderDecryptionTime(output.decryptionTime)
 }
 
-function renderError(error: Error) {
+function renderError(error: unknown) {
     console.error(error)
-    errorMessage.innerText = error.message
+
+    if (error instanceof Error) {
+        errorMessage.innerText = error.message
+    } else if (typeof error === "string") {
+        errorMessage.innerText = error
+    }
 }
 
 function renderDecryptionTime(time: number) {

@@ -2,36 +2,61 @@
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
-    <title>deadman encryption</title>
-    <link rel="stylesheet" type="text/css" href="index.css"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Timevault</title>
+    <link rel="stylesheet" href="scss/styles.scss">
 </head>
 <body>
 
-<div id="container">
-    <h1>Enter text to encrypt/decrypt</h1>
-    <div id="controls">
-        <div>
-            <label for="time">Decryption time</label>
+<div class="container-xxl p-lg-5">
+
+    <!-- HEADER -->
+    <div class="row mb-5">
+        <h1>Timevault</h1>
+        <h3>by <a href="https://drand.love"><img height="50em" src="images/drand-logo.png" alt="drand"></a></h3>
+        <p>Enter your text below to encrypt or decrypt</p>
+    </div>
+
+    <!-- MAIN BODY-->
+
+    <!-- ACTION BAR-->
+    <div class="row p-3 light-bg align-items-end">
+        <div class="col p-0">
+            <label for="time" class="form-label p-lg-0">Set decryption time</label>
             <input
+                    class="form-control"
                     id="time"
                     type="datetime-local"
             />
         </div>
-        <div id="errors">
-            <p id="error"></p>
+        <div class="col p-0" id="errors">
+            <p class="m-0 p-0" id="error"></p>
         </div>
-        <div>
-            <button id="encrypt-button">Encrypt/decrypt!</button>
+        <div class="col p-0">
+            <label for="encrypt-button" class="form-label p-lg-0"></label>
+            <button
+                    id="encrypt-button"
+                    type="button"
+                    class="btn btn-primary float-end"
+            >
+                Encrypt / Decrypt
+            </button>
         </div>
     </div>
-    <div id="text-areas">
-        <div class="input-group">
-            <label for="plaintext">Plaintext</label>
-            <textarea id="plaintext"></textarea>
+
+    <!-- INPUTS-->
+    <div class="row light-bg p-3">
+        <div class="col col-md-6 col-sm-12 p-3">
+            <div class="row mb-6">
+                <label for="plaintext" class="form-label p-lg-0">Plaintext</label>
+                <textarea id="plaintext" class="form-control" cols="3" rows="25"></textarea>
+            </div>
         </div>
-        <div class="input-group">
-            <label for="ciphertext">Ciphertext</label>
-            <textarea id="ciphertext"></textarea>
+        <div class="col col-md-6 col-sm-12 p-3">
+            <div class="row mb-6">
+                <label for="ciphertext" class="form-label p-lg-0">Ciphertext</label>
+                <textarea id="ciphertext" class="form-control" cols="3" rows="25"></textarea>
+            </div>
         </div>
     </div>
 </div>
