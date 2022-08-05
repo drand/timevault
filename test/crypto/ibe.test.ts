@@ -1,14 +1,14 @@
 import * as bls from "@noble/bls12-381"
 import {Fp, Fp2, Fp12} from "@noble/bls12-381"
 import {expect} from "chai"
-import {encrypt, fp12ToBytes, fp2ToBytes, fpToBytes, gtToHash, toField} from "../src/crypto/ibe"
-import {timelockEncrypt} from "../src/drand/timelock"
-import {defaultClientInfo, DrandHttpClient} from "../src/drand/drand-client"
+import {fp12ToBytes, fp2ToBytes, fpToBytes} from "../../src/crypto/utils"
+import {gtToHash} from "../../src/crypto/ibe"
 
 describe("fpToBytes", () => {
     it("two Fps should combine into one", () => {
         const combined = Buffer.concat([fpToBytes(new Fp(1n)), fpToBytes(new Fp(2n))])
         const fp2 = fp2ToBytes(Fp2.fromBigTuple([1n, 2n]))
+
         expect(Buffer.compare(fp2, combined)).to.equal(0)
     })
 

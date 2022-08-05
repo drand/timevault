@@ -1,13 +1,12 @@
 import * as chai from "chai"
 import {expect} from "chai"
-import chaiAsPromised from "chai-as-promised"
 import {MockDrandClient} from "./mock-drand-client"
 import {timelockEncrypt} from "../../src/drand/timelock"
 import {defaultClientInfo} from "../../src/drand/drand-client"
 import {readAge} from "../../src/age/age-reader-writer"
 import {decodeArmor} from "../../src/age/armor"
 import {createTimelockDecrypter} from "../../src/drand/timelock-decrypter"
-chai.use(chaiAsPromised)
+import {assertError} from "../utils"
 
 describe("timelock decrypter", () => {
     const validBeacon = {
@@ -27,25 +26,27 @@ describe("timelock decrypter", () => {
         expect(decryptedFileKey.length).to.be.greaterThan(0)
     })
 
-    it("should throw an error if multiple recipient stanzas are provided", () => {
+    it("should throw an error if multiple recipient stanzas are provided", async () => {
         const stanza = {
             type: "tlock",
             args: ["1", "deadbeef"],
             body: Buffer.from("deadbeef")
         }
-        expect(createTimelockDecrypter(mockClient)([stanza, stanza])).to.be.rejectedWith()
+
+        await assertError(() => createTimelockDecrypter(mockClient)([stanza, stanza]))
     })
 
-    it("should blow up if the stanza type isn't 'tlock'", () => {
+    it("should blow up if the stanza type isn't 'tlock'", async () => {
         const stanza = {
             type: "unsupported-type",
             args: ["1", "deadbeef"],
             body: Buffer.from("deadbeef")
         }
-        expect(createTimelockDecrypter(mockClient)([stanza, stanza])).to.be.rejectedWith()
+
+        await assertError(() => createTimelockDecrypter(mockClient)([stanza, stanza]))
     })
 
-    it("should blow up if roundNumber or chainHash are missing from the args of the stanza", () => {
+    it("should blow up if roundNumber or chainHash are missing from the args of the stanza", async () => {
         const missingChainHash = {
             type: "tlock",
             args: ["1"],
@@ -56,25 +57,28 @@ describe("timelock decrypter", () => {
             args: ["deadbeef"],
             body: Buffer.from("deadbeef")
         }
-        expect(createTimelockDecrypter(mockClient)([missingChainHash])).to.be.rejectedWith()
-        expect(createTimelockDecrypter(mockClient)([missingRoundNumber])).to.be.rejectedWith()
+
+        await assertError(() => createTimelockDecrypter(mockClient)([missingChainHash]))
+        await assertError(() => createTimelockDecrypter(mockClient)([missingRoundNumber]))
     })
 
-    it("should blow up if the roundNumber isn't a number", () => {
+    it("should blow up if the roundNumber isn't a number", async () => {
         const invalidRoundNumberArg = {
             type: "tlock",
             args: ["shouldbeanum", "deadbeef"],
             body: Buffer.from("deadbeef")
         }
-        expect(createTimelockDecrypter(mockClient)([invalidRoundNumberArg])).to.be.rejectedWith()
+
+        await assertError(() => createTimelockDecrypter(mockClient)([invalidRoundNumberArg]))
     })
 
-    it("should blow up if the chainHash isn't hex", () => {
+    it("should blow up if the chainHash isn't hex", async () => {
         const invalidChainHashArg = {
             type: "tlock",
             args: ["1", "not just hex chars"],
             body: Buffer.from("deadbeef")
         }
-        expect(createTimelockDecrypter(mockClient)([invalidChainHashArg])).to.be.rejectedWith()
+
+        await assertError(() => createTimelockDecrypter(mockClient)([invalidChainHashArg]))
     })
 })
