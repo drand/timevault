@@ -1,9 +1,8 @@
 import * as chai from "chai"
-import {AssertionError, expect} from "chai"
+import {expect} from "chai"
 import {defaultClientInfo, DrandHttpClient, roundForTime} from "../../src/drand/drand-client"
-import chaiAsPromised from "chai-as-promised"
+import {assertError, assertErrorMessage} from "../utils"
 
-chai.use(chaiAsPromised)
 
 describe("drand-client", () => {
     describe("get", () => {
@@ -12,7 +11,7 @@ describe("drand-client", () => {
             const errorFetch = () => Promise.reject(expectedErrorMessage)
             const client = new DrandHttpClient(defaultClientInfo, {fetchJson: errorFetch})
 
-            return expect(client.get(1)).to.be.rejectedWith(expectedErrorMessage)
+            await assertErrorMessage(() => client.get(1), expectedErrorMessage)
         })
 
         it("returns an error if the randomness is not hex", async () => {
@@ -98,13 +97,3 @@ describe("drand-client", () => {
         })
     })
 })
-
-async function assertError(fn: () => Promise<unknown>, message?: string): Promise<void> {
-    let result = null
-    try {
-        result = await fn()
-    } catch (err) {
-        return
-    }
-    throw new AssertionError(message ?? `Expected error, but received ${result}`)
-}

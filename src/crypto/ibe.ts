@@ -108,12 +108,12 @@ export function toField(h3ret: Uint8Array) {
     let data = h3ret
     // assuming Big Endianness
     let n: bigint = bytesToNumberBE(data)
-    while (n <= 0 || n > bls.CURVE.r) {
+    do {
         data = sha256(data)
         // assuming Big Endianness
         data[0] = data[0] >> BitsToMaskForBLS12381
         n = bytesToNumberBE(data)
-    }
+    } while (n <= 0 || n > bls.CURVE.r)
 
     return n
 }

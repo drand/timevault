@@ -1,19 +1,18 @@
 import * as bls from "@noble/bls12-381"
 import {Fp, Fp2, Fp12} from "@noble/bls12-381"
 import {expect} from "chai"
-import {encrypt, fp12ToBytes, fp2ToBytes, fpToBytes, gtToHash, toField} from "../src/crypto/ibe"
-import {timelockEncrypt} from "../src/drand/timelock"
-import {defaultClientInfo, DrandHttpClient} from "../src/drand/drand-client"
+import {fp12ToBytes, fp2ToBytes, fpToBytes} from "../../src/crypto/utils"
+import {gtToHash} from "../../src/crypto/ibe"
 
 describe("fpToBytes", () => {
-    it("two Fps should combine into one", () => {
+    it("should reverse the order of values in the Fps", () => {
         const combined = Buffer.concat([fpToBytes(new Fp(1n)), fpToBytes(new Fp(2n))])
-        const fp2 = fp2ToBytes(Fp2.fromBigTuple([1n, 2n]))
+        const fp2 = fp2ToBytes(Fp2.fromBigTuple([2n, 1n]))
+
         expect(Buffer.compare(fp2, combined)).to.equal(0)
     })
 
-    it("lots of Fp2s should combine to an Fp12", () => {
-        const fullFp12 = fp12ToBytes(Fp12.fromBigTwelve([1n, 2n, 3n, 4n, 5n, 6n, 7n, 8n, 9n, 10n, 11n, 12n]))
+    it("Fp2s should be reversed when combined to an Fp12", () => {
         const one = fp2ToBytes(Fp2.fromBigTuple([1n, 2n]))
         const two = fp2ToBytes(Fp2.fromBigTuple([3n, 4n]))
         const three = fp2ToBytes(Fp2.fromBigTuple([5n, 6n]))
@@ -22,16 +21,18 @@ describe("fpToBytes", () => {
         const six = fp2ToBytes(Fp2.fromBigTuple([11n, 12n]))
         const combined = Buffer.concat([one, two, three, four, five, six])
 
+        const fullFp12 = fp12ToBytes(Fp12.fromBigTwelve([11n, 12n, 9n, 10n, 7n, 8n, 5n, 6n, 3n, 4n, 1n, 2n]))
+
         expect(Buffer.compare(fullFp12, combined)).to.equal(0)
     })
 
     it("big nums should not lose precision", () => {
         // a number with more than 64bits
-        const buffer = Buffer.from("ffffffffff", "hex")
+        const expectedHexValue = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000ffffffffff"
         // the same value as a `bigint`
         const bytes = fpToBytes(new Fp(1099511627775n))
 
-        expect(Buffer.compare(buffer, bytes)).to.equal(0)
+        expect(Buffer.from(bytes).toString("hex")).to.equal(expectedHexValue)
     })
 
     it("correctly pass the test vectors generated from the go codebase", () => {
@@ -62,7 +63,7 @@ describe("fpToBytes", () => {
         const expectedAdded = "079ab7b345eb23c944c957a36a6b74c37537163d4cbf73bad9751de1dd9c68ef72cb21447e259880f72a871c3eda1b0c017f1c95cf79b22b459599ea57e613e00cb75e35de1f837814a93b443c54241015ac9761f8fb20a44512ff5cfc04ac7f0f6b8b52b2b5d0661cbf232820a257b8c5594309c01c2a45e64c6a7142301e4fb36e6e16b5a85bd2e437599d103c3ace06d8046c6b3424c4cd2d72ce98d279f2290a28a87e8664cb0040580d0c485f34df45267f8c215dcbcd862787ab555c7e113286dee21c9c63a458898beb35914dc8daaac453441e7114b21af7b5f47d559879d477cf2a9cbd5b40c86becd071280900410bb2751d0a6af0fe175dcf9d864ecaac463c6218745b543f9e06289922434ee446030923a3e4c4473b4e3b1914081abd33a78d31eb8d4c1bb3baab0529bb7baf1103d848b4cead1a8e0aa7a7b260fbe79c67dbe41ca4d65ba8a54a72b61692a61ce5f4d7a093b2c46aa4bca6c4a66cf873d405ebc9c35d8aa639763720177b23beffaf522d5e41d3c5310ea3331409cebef9ef393aa00f2ac64673675521e8fc8fddaf90976e607e62a740ac59c3dddf95a6de4fba15beb30c43d4e3f803a3734dbeb064bf4bc4a03f945a4921e49d04ab8d45fd753a28b8fa082616b4b17bbcb685e455ff3bf8f60c3bd32a0c185ef728cf41a1b7b700b7e445f0b372bc29e370bc227d443c70ae9dbcf73fee8acedbd317a286a53266562d817269c004fb0f149dd925d2c590a960936763e519c2b62e14c7759f96672cd852194325904197b0b19c6b528ab33566946af39b"
         expect(Buffer.from(fp12ToBytes(test.multiply(test))).toString("hex")).to.equal(expectedAdded)
 
-        const expectedGtToHash = "d932a11f355c22d6c68d2f98b40e72e6"
+        const expectedGtToHash = "cb87319f24560b5231579a09ad79f12e"
         expect(Buffer.from(gtToHash(test, 16)).toString("hex")).to.equal(expectedGtToHash)
 
         const expectedG1Compressed = "97f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb"
