@@ -1,6 +1,5 @@
-import {chunked, sliceUntil, unpaddedBase64} from "./utils"
+import {chunked, unpaddedBase64} from "./utils"
 import {createMacKey} from "./utils-crypto"
-import internal from "stream"
 
 type Stanza = {
     type: string,
