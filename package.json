@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "bootstrap": "^5.2.0",
-    "tlock-js": "^0.0.1",
+    "tlock-js": "^0.0.2",
     "yup": "^0.32.11"
   },
   "browserslist": [
