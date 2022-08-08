@@ -1,6 +1,8 @@
 # ️Timevault ✉ 🪦
 
-A deadman's switch to encrypt your vulnerability reports or other compromising data to be decryptable at a set time in the future.  Powered by [drand](https://drand.love).
+A deadman's switch to encrypt your vulnerability reports or other compromising data to be decryptable at a set time in the future.  Uses [tlock-js](https://github.com/drand/tlock-js) and is powered by [drand](https://drand.love).
+
+Automagically deploys to https://timevault.drand.love
 
 ## Prerequisites
 - node 16+
