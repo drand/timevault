@@ -1,4 +1,5 @@
 import {CompletedWebForm, encryptedOrDecryptedFormData} from "./encryption"
+
 const plaintextElement = document.getElementById("plaintext") as HTMLTextAreaElement
 const ciphertextElement = document.getElementById("ciphertext") as HTMLTextAreaElement
 const timeElement = document.getElementById("time") as HTMLInputElement
@@ -6,7 +7,7 @@ const encryptButton = document.getElementById("encrypt-button") as HTMLButtonEle
 const errorMessage = document.getElementById("error") as HTMLParagraphElement
 
 document.addEventListener("DOMContentLoaded", () => {
-    renderDecryptionTime(Date.now())
+    renderDecryptionTime(new Date(Date.now()))
 })
 
 encryptButton.addEventListener("click", async () => {
@@ -18,12 +19,8 @@ encryptButton.addEventListener("click", async () => {
     }
 })
 
-function formAsObject() {
-    return {
-        plaintext: plaintextElement.value,
-        ciphertext: ciphertextElement.value,
-        decryptionTime: timeElement.valueAsNumber,
-    }
+function clearErrors() {
+    errorMessage.innerText = ""
 }
 
 function render(output: CompletedWebForm) {
@@ -33,7 +30,27 @@ function render(output: CompletedWebForm) {
     if (output.ciphertext) {
         ciphertextElement.value = output.ciphertext
     }
-    renderDecryptionTime(output.decryptionTime)
+    renderDecryptionTime(new Date(output.decryptionTime))
+}
+
+function formAsObject() {
+    return {
+        plaintext: plaintextElement.value,
+        ciphertext: ciphertextElement.value,
+        decryptionTime: new Date(timeElement.value).getTime(),
+    }
+}
+
+function renderDecryptionTime(date: Date) {
+    timeElement.value = formatDate(date)
+}
+
+function formatDate(date: Date) {
+    return `${date.getFullYear()}-${padTo2Digits(date.getMonth() + 1)}-${padTo2Digits(date.getDate())} ${padTo2Digits(date.getHours())}:${padTo2Digits(date.getMinutes())}`
+}
+
+function padTo2Digits(num: number) {
+    return num.toString().padStart(2, "0")
 }
 
 function renderError(error: unknown) {
@@ -44,16 +61,4 @@ function renderError(error: unknown) {
     } else if (typeof error === "string") {
         errorMessage.innerText = error
     }
-}
-
-function renderDecryptionTime(time: number) {
-    const wrappedTime = new Date(time)
-    wrappedTime.setSeconds(0)
-    wrappedTime.setMilliseconds(0)
-    // neither `value` nor `valueAsDate` work in both chrome _and_ firefox... nice
-    timeElement.valueAsNumber = wrappedTime.getTime()
-}
-
-function clearErrors() {
-    errorMessage.innerText = ""
 }
