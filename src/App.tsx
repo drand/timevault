@@ -1,7 +1,7 @@
 import {Fragment, h} from "preact"
 import {useState} from "preact/compat"
-import {TextEncrypt} from "./views/TextEncrypt"
-import {FileEncrypt} from "./views/FileEncrypt"
+import {TextEncrypt} from "./components/TextEncrypt"
+import {FileEncrypt} from "./components/FileEncrypt"
 
 const App = () => <Tabs>
     <Tab title={"Text"}>

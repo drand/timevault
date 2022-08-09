@@ -1,6 +1,6 @@
 import {Fragment, h} from "preact"
-import React, {useCallback, useState} from "preact/compat"
-import {Button, TextArea, TimeInput} from "../components/Input"
+import React, {useEffect, useState} from "preact/compat"
+import {TextArea, TimeInput} from "./Input"
 import {encryptFile} from "../actions/encrypt-file"
 
 const FileEncrypt = () => {
@@ -8,6 +8,16 @@ const FileEncrypt = () => {
     const [ciphertext, setCiphertext] = useState("")
     const [decryptionTime, setDecryptionTime] = useState(Date.now())
     const [error, setError] = useState("")
+
+    useEffect(() => {
+        if (!files) {
+            return
+        }
+        encryptFile(files, decryptionTime)
+            .then(ciphertext => setCiphertext(ciphertext))
+            .catch(err => onError(err))
+
+    }, [files])
 
     const onError = (err: unknown) => {
         console.error(err)
@@ -18,18 +28,6 @@ const FileEncrypt = () => {
             setError(err)
         }
     }
-
-    const performEncryption = useCallback(async () => {
-        try {
-            if (!files) {
-                console.log("No files to encrypt")
-                return
-            }
-            setCiphertext(await encryptFile(files, decryptionTime))
-        } catch (err) {
-            onError(err)
-        }
-    }, [files, ciphertext, decryptionTime])
 
     return (
         <Fragment>
@@ -43,12 +41,6 @@ const FileEncrypt = () => {
                 </div>
                 <div class="col p-0" id="errors">
                     <p className="m-0 p-0" id="error">{error}</p>
-                </div>
-                <div class="col p-0">
-                    <Button
-                        text={"Encrypt"}
-                        onClick={performEncryption}
-                    />
                 </div>
             </div>
 

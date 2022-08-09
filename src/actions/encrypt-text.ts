@@ -19,7 +19,7 @@ export async function encryptedOrDecryptedFormData(form: unknown): Promise<Compl
 
 async function encrypt(plaintext: string, decryptionTime: number): Promise<CompletedWebForm> {
     const roundNumber = roundForTime(decryptionTime, defaultClientInfo)
-    const ciphertext = await timelockEncrypt(roundNumber, plaintext)
+    const ciphertext = await timelockEncrypt(roundNumber, Buffer.from(plaintext))
     return {
         plaintext,
         decryptionTime,

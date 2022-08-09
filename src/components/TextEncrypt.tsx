@@ -1,25 +1,28 @@
 import {Fragment, h} from "preact"
-import {useCallback, useState} from "preact/compat"
-import {Button, TextArea, TimeInput} from "../components/Input"
-import {encryptedOrDecryptedFormData} from "../actions/encrypt-text"
+import {useEffect, useMemo, useState} from "preact/compat"
+import {TextArea, TimeInput} from "./Input"
+import {CompletedWebForm, encryptedOrDecryptedFormData} from "../actions/encrypt-text"
+import {createDebouncer} from "../actions/debounce"
 
 const TextEncrypt = () => {
     const [plaintext, setPlaintext] = useState("")
     const [ciphertext, setCiphertext] = useState("")
     const [decryptionTime, setDecryptionTime] = useState(Date.now())
     const [error, setError] = useState("")
+    const debounced = useMemo(() => createDebouncer<CompletedWebForm>(), [])
 
-    const performEncryption = useCallback(async () => {
-        try {
-            const output = await encryptedOrDecryptedFormData({plaintext, ciphertext, decryptionTime})
-
-            setPlaintext(output.plaintext ?? "")
-            setCiphertext(output.ciphertext ?? "")
-            setDecryptionTime(output.decryptionTime)
-        } catch (err) {
-            onError(err)
+    useEffect(() => {
+        if (!plaintext) {
+            return
         }
-    }, [plaintext, ciphertext, decryptionTime])
+
+        debounced(() => encryptedOrDecryptedFormData({plaintext, ciphertext, decryptionTime}))
+            .then(output => {
+                setCiphertext(output.ciphertext ?? "")
+                setDecryptionTime(output.decryptionTime)
+            })
+            .catch(err => onError(err))
+    }, [plaintext])
 
     const onError = (err: unknown) => {
         console.error(err)
@@ -34,21 +37,15 @@ const TextEncrypt = () => {
     return (
         <Fragment>
             <div class="light-bg row p-3 align-items-end">
-                <div class="col p-0">
+                <div class="col col-md-4 p-0">
                     <TimeInput
                         label={"Decryption time"}
                         value={decryptionTime}
                         onChange={setDecryptionTime}
                     />
                 </div>
-                <div class="col p-0" id="errors">
+                <div class="col col-md-12 p-0" id="errors">
                     <p className="m-0 p-0" id="error">{error}</p>
-                </div>
-                <div class="col p-0">
-                    <Button
-                        text={"Encrypt / Decrypt"}
-                        onClick={performEncryption}
-                    />
                 </div>
             </div>
 
