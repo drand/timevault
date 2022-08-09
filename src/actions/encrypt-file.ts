@@ -16,5 +16,9 @@ export async function encryptFile(files: FileList, decryptionTime: number): Prom
 
     const roundNumber = roundForTime(decryptionTime, defaultClientInfo)
 
-    return await timelockEncrypt(roundNumber, Buffer.from(new Uint8Array(await file.arrayBuffer())))
+    return await timelockEncrypt(roundNumber, await fileAsBuffer(file))
+}
+
+async function fileAsBuffer(file: File): Promise<Buffer> {
+    return Buffer.from(new Uint8Array(await file.arrayBuffer()))
 }
