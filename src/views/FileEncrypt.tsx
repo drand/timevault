@@ -4,6 +4,7 @@ import {encryptFile} from "../actions/encrypt-file"
 import {FileInput} from "../components/FileInput"
 import {TimeInput} from "../components/TimeInput"
 import {TextArea} from "../components/TextArea"
+import {errorMessage} from "../actions/errors"
 
 const FileEncrypt = () => {
     const [files, setFiles] = useState<FileList>()
@@ -17,19 +18,11 @@ const FileEncrypt = () => {
         }
         encryptFile(files, decryptionTime)
             .then(ciphertext => setCiphertext(ciphertext))
-            .catch(err => onError(err))
-
+            .catch(err => {
+                console.error(err)
+                setError(errorMessage(err))
+            })
     }, [files])
-
-    const onError = (err: unknown) => {
-        console.error(err)
-
-        if (err instanceof Error) {
-            setError(err.message)
-        } else if (typeof err === "string") {
-            setError(err)
-        }
-    }
 
     return (
         <Fragment>

@@ -4,6 +4,7 @@ import {CompletedWebForm, encryptedOrDecryptedFormData} from "../actions/encrypt
 import {createDebouncer} from "../actions/debounce"
 import {TextArea} from "../components/TextArea"
 import {TimeInput} from "../components/TimeInput"
+import {errorMessage} from "../actions/errors"
 
 const TextEncrypt = () => {
     const [plaintext, setPlaintext] = useState("")
@@ -22,18 +23,11 @@ const TextEncrypt = () => {
                 setCiphertext(output.ciphertext ?? "")
                 setDecryptionTime(output.decryptionTime)
             })
-            .catch(err => onError(err))
+            .catch(err => {
+                console.error(err)
+                setError(errorMessage(err))
+            })
     }, [plaintext])
-
-    const onError = (err: unknown) => {
-        console.error(err)
-
-        if (err instanceof Error) {
-            setError(err.message)
-        } else if (typeof err === "string") {
-            setError(err)
-        }
-    }
 
     return (
         <Fragment>
