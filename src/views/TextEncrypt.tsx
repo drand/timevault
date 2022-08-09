@@ -1,8 +1,9 @@
+import React, {useEffect, useMemo, useState} from "preact/compat"
 import {Fragment, h} from "preact"
-import {useEffect, useMemo, useState} from "preact/compat"
-import {TextArea, TimeInput} from "./Input"
 import {CompletedWebForm, encryptedOrDecryptedFormData} from "../actions/encrypt-text"
 import {createDebouncer} from "../actions/debounce"
+import {TextArea} from "../components/TextArea"
+import {TimeInput} from "../components/TimeInput"
 
 const TextEncrypt = () => {
     const [plaintext, setPlaintext] = useState("")

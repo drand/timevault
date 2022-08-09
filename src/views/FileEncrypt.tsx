@@ -1,7 +1,9 @@
 import {Fragment, h} from "preact"
 import React, {useEffect, useState} from "preact/compat"
-import {TextArea, TimeInput} from "./Input"
 import {encryptFile} from "../actions/encrypt-file"
+import {FileInput} from "../components/FileInput"
+import {TimeInput} from "../components/TimeInput"
+import {TextArea} from "../components/TextArea"
 
 const FileEncrypt = () => {
     const [files, setFiles] = useState<FileList>()
@@ -66,23 +68,5 @@ const FileEncrypt = () => {
         </Fragment>
     )
 }
-
-type FileInputProps = {
-    label: string
-    onChange: (files: FileList) => void
-}
-const FileInput = (props: FileInputProps) =>
-    <label
-        className="form-label p-lg-0"
-    >
-        {props.label}
-
-        <input
-            type="file"
-            className={"form-control"}
-            onChange={event => event.currentTarget.files && props.onChange(event.currentTarget.files)}
-        />
-
-    </label>
 
 export {FileEncrypt}

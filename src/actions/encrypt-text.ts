@@ -1,11 +1,11 @@
 import * as yup from "yup"
 import {defaultClientInfo, roundForTime, timelockDecrypt, timelockEncrypt} from "tlock-js"
-import {webFormSchema} from "../schema/webform-schema"
+import {textEncryptionSchema} from "../schema/text-encryption-schema"
 
-export type CompletedWebForm = yup.InferType<typeof webFormSchema>
+export type CompletedWebForm = yup.InferType<typeof textEncryptionSchema>
 
 export async function encryptedOrDecryptedFormData(form: unknown): Promise<CompletedWebForm> {
-    const partialWebForm = await webFormSchema.validate(form)
+    const partialWebForm = await textEncryptionSchema.validate(form)
 
     if (partialWebForm.plaintext) {
         return encrypt(partialWebForm.plaintext, partialWebForm.decryptionTime)

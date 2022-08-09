@@ -1,4 +1,5 @@
 import {defaultClientInfo, roundForTime, timelockEncrypt} from "tlock-js"
+import {fileAsBuffer} from "./file-utils"
 
 export async function encryptFile(files: FileList, decryptionTime: number): Promise<string> {
     if (files.length === 0) {
@@ -17,8 +18,4 @@ export async function encryptFile(files: FileList, decryptionTime: number): Prom
     const roundNumber = roundForTime(decryptionTime, defaultClientInfo)
 
     return await timelockEncrypt(roundNumber, await fileAsBuffer(file))
-}
-
-async function fileAsBuffer(file: File): Promise<Buffer> {
-    return Buffer.from(new Uint8Array(await file.arrayBuffer()))
 }
