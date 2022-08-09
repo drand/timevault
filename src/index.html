@@ -9,58 +9,13 @@
 <body>
 
 <div class="container-xxl p-lg-5">
-
-    <!-- HEADER -->
     <div class="row mb-5">
         <h1>Timevault</h1>
         <h3>by <a href="https://drand.love"><img height="50em" src="images/drand-logo.png" alt="drand"></a></h3>
         <p>Enter your text below to encrypt or decrypt</p>
     </div>
 
-    <!-- MAIN BODY-->
+    <div id="root"></div>
 
-    <!-- ACTION BAR-->
-    <div class="light-bg row p-3 align-items-end">
-        <div class="col p-0">
-            <label for="time" class="form-label p-lg-0">Set decryption time</label>
-            <input
-                    class="form-control"
-                    id="time"
-                    type="datetime-local"
-            />
-        </div>
-        <div class="col p-0" id="errors">
-            <p class="m-0 p-0" id="error"></p>
-        </div>
-        <div class="col p-0">
-            <label for="encrypt-button" class="form-label p-lg-0"></label>
-            <button
-                    id="encrypt-button"
-                    type="button"
-                    class="btn btn-primary float-end"
-            >
-                Encrypt / Decrypt
-            </button>
-        </div>
-    </div>
-
-    <!-- INPUTS-->
-    <div class="row light-bg p-3">
-        <div class="col-12 col-lg-6 p-3">
-            <div class="row mb-6">
-                <label for="plaintext" class="form-label p-lg-0">Plaintext</label>
-                <textarea id="plaintext" class="form-control" cols="3" rows="25"></textarea>
-            </div>
-        </div>
-        <div class="col-12 col-lg-6 p-3">
-            <div class="row mb-6">
-                <label for="ciphertext" class="form-label p-lg-0">Ciphertext</label>
-                <textarea id="ciphertext" class="form-control" cols="3" rows="25"></textarea>
-            </div>
-        </div>
-    </div>
+    <script src="./index.tsx" type="module"></script>
 </div>
-
-<script src="index.ts" type="module"></script>
-</body>
-</html>

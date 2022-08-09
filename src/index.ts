@@ -1,4 +1,4 @@
-import {CompletedWebForm, encryptedOrDecryptedFormData} from "./encryption"
+import {CompletedWebForm, encryptedOrDecryptedFormData} from "./actions/encrypt-text"
 
 const plaintextElement = document.getElementById("plaintext") as HTMLTextAreaElement
 const ciphertextElement = document.getElementById("ciphertext") as HTMLTextAreaElement
