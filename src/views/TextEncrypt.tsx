@@ -39,7 +39,7 @@ const TextEncrypt = () => {
                         onChange={setDecryptionTime}
                     />
                 </div>
-                <div class="col col-md-12 p-0" id="errors">
+                <div class="col p-0" id="errors">
                     <p className="m-0 p-0" id="error">{error}</p>
                 </div>
             </div>
