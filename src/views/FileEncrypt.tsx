@@ -39,11 +39,11 @@ const FileEncrypt = () => {
                 </div>
             </div>
 
-            <div class="row light-bg p-3">
+            <div class="row light-bg px-3">
                 <div className="col-12 col-lg-6 p-3">
                     <div className="row mb-6">
                         <FileInput
-                            label={"Upload a file or archive to encrypt"}
+                            label={"Upload an archive to encrypt"}
                             onChange={setFiles}
                         />
                     </div>

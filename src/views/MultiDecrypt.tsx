@@ -5,7 +5,7 @@ import {DecryptionContent, decryptMulti} from "../actions/decrypt-multi"
 import {errorMessage} from "../actions/errors"
 import {Button} from "../components/Button"
 import {TextInput} from "../components/TextInput"
-import {downloadFile, fileExtension} from "../actions/file-utils"
+import {downloadFile} from "../actions/file-utils"
 
 export const MultiDecrypt = () => {
     const [ciphertext, setCiphertext] = useState("")
@@ -23,7 +23,7 @@ export const MultiDecrypt = () => {
             .then(() => setIsLoading(false))
             .catch(err => {
                 console.error(err)
-                setError(errorMessage(err))
+                setError("There was an error during decryption! Is your ciphertext valid?")
                 setIsLoading(false)
             })
     }, [ciphertext])
@@ -37,8 +37,8 @@ export const MultiDecrypt = () => {
                 </div>
             </div>
 
-            <div className="row light-bg p-3">
-                <div className="col-12 col-lg-6 p-3">
+            <div className="row light-bg px-3">
+                <div className="col-12 col-lg-6 px-3">
                     <div className="row mb-6">
                         <TextArea
                             label={"Ciphertext"}
@@ -47,7 +47,7 @@ export const MultiDecrypt = () => {
                         />
                     </div>
                 </div>
-                <div className="col-12 col-lg-6 p-3">
+                <div className="col-12 col-lg-6 px-3">
                     <div className="row mb-6">
                         <DecryptedContentView
                             content={content}
@@ -118,7 +118,7 @@ const VulnerabilityReport = (props: VulnerabilityReportProps) => {
     const file = props.file
 
     return (
-        <div className="col p-3">
+        <div className="col px-3">
             <div className="row mb-6">
                 <TextInput
                     label={"Title"}

@@ -44,7 +44,7 @@ const TextEncrypt = () => {
                 </div>
             </div>
 
-            <div class="row light-bg p-3">
+            <div class="row light-bg px-3">
                 <div class="col-12 col-lg-6 p-3">
                     <div className="row mb-6">
                         <TextArea
