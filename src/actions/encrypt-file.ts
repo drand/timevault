@@ -1,5 +1,5 @@
 import {defaultClientInfo, roundForTime, timelockEncrypt} from "tlock-js"
-import {fileAsBuffer} from "./file-utils"
+import {fileAsBuffer, isSupportedFileType} from "./file-utils"
 
 export async function encryptFile(files: FileList, decryptionTime: number): Promise<string> {
     if (files.length === 0) {
@@ -15,7 +15,10 @@ export async function encryptFile(files: FileList, decryptionTime: number): Prom
         throw Error("Somehow there  was no file in the file list!")
     }
 
-    const roundNumber = roundForTime(decryptionTime, defaultClientInfo)
+    if (!isSupportedFileType(file)) {
+        throw Error("Right now tlock web only supports zip, tar and gzip files!")
+    }
 
+    const roundNumber = roundForTime(decryptionTime, defaultClientInfo)
     return await timelockEncrypt(roundNumber, await fileAsBuffer(file))
 }

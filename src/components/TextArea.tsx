@@ -4,7 +4,7 @@ import {h} from "preact"
 type TextAreaProps = {
     label: string
     value: string
-    onChange: (value: string) => void
+    onChange?: (value: string) => void
     rows?: number
     cols?: number
 }
@@ -26,6 +26,6 @@ export const TextArea = (props: TextAreaProps) =>
             cols={props.cols ?? defaultProps.cols}
             rows={props.rows ?? defaultProps.rows}
             value={props.value}
-            onChange={event => props.onChange(event.currentTarget.value)}
+            onChange={event => props.onChange && props.onChange(event.currentTarget.value)}
         ></textarea>
     </label>
