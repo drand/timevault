@@ -52,3 +52,11 @@ function isGzip(buf: Buffer): boolean {
     const gzipMagicBytes = [0x1F, 0x8B, 0x8]
     return buf.subarray(0, 3).equals(Buffer.from(new Uint8Array(gzipMagicBytes)))
 }
+
+export function downloadFile(file: File) {
+    const anchor = document.createElement("a")
+    anchor.href = URL.createObjectURL(file)
+    document.body.appendChild(anchor)
+    anchor.click()
+    document.body.removeChild(anchor)
+}

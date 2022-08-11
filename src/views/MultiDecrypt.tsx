@@ -5,22 +5,26 @@ import {DecryptionContent, decryptMulti} from "../actions/decrypt-multi"
 import {errorMessage} from "../actions/errors"
 import {Button} from "../components/Button"
 import {TextInput} from "../components/TextInput"
+import {downloadFile, fileExtension} from "../actions/file-utils"
 
 export const MultiDecrypt = () => {
     const [ciphertext, setCiphertext] = useState("")
     const [content, setContent] = useState<DecryptionContent>()
     const [error, setError] = useState("")
-    const [isLoading, setLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
 
     useEffect(() => {
         if (!ciphertext) {
             return
         }
+        setIsLoading(true)
         decryptMulti(ciphertext)
             .then(c => setContent(c))
+            .then(() => setIsLoading(false))
             .catch(err => {
                 console.error(err)
                 setError(errorMessage(err))
+                setIsLoading(false)
             })
     }, [ciphertext])
 
@@ -45,7 +49,10 @@ export const MultiDecrypt = () => {
                 </div>
                 <div className="col-12 col-lg-6 p-3">
                     <div className="row mb-6">
-                        <DecryptedContentView content={content}/>
+                        <DecryptedContentView
+                            content={content}
+                            isLoading={isLoading}
+                        />
                     </div>
                 </div>
             </div>
@@ -55,15 +62,24 @@ export const MultiDecrypt = () => {
 }
 
 type DecryptedContentViewProps = {
+    isLoading: boolean
     content?: DecryptionContent
 }
 const DecryptedContentView = (props: DecryptedContentViewProps) => {
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    const noop = () => {
+    if (props.isLoading) {
+        return (
+            <div className={"row justify-content-center"}>
+                <div className="spinner-border" role="status"></div>
+            </div>
+        )
     }
     const content = props.content
     if (!content) {
-        return <p>This will load once you enter a ciphertext...</p>
+        return (
+            <div className={"row justify-content-center"}>
+                <p className={"text-align-center"}><br/>This will load once you enter a ciphertext...</p>
+            </div>
+        )
     }
 
     if (content.type === "text") {
@@ -95,39 +111,45 @@ const DecryptedContentView = (props: DecryptedContentViewProps) => {
 type VulnerabilityReportProps = {
     title: string
     description: string
-    cve?: string | null
-    file?: File | null
+    cve?: string
+    file?: File
 }
-const VulnerabilityReport = (props: VulnerabilityReportProps) =>
-    <div className="col p-3">
-        <div className="row mb-6">
-            <TextInput
-                label={"Title"}
-                value={props.title}
-            />
-        </div>
-        <div className="row mb-6">
-            <TextArea
-                label={"Description"}
-                value={props.description}
-                rows={15}
-            />
-        </div>
-        <div className="row mb-6">
-            <TextInput
-                label={"CVE"}
-                value={props.cve ?? ""}
-            />
-        </div>
-        <div className="row mb-6">
-            <p>PUT SOME FILE DOWNLOADER HERE</p>
-        </div>
-    </div>
+const VulnerabilityReport = (props: VulnerabilityReportProps) => {
+    const file = props.file
 
-function downloadFile(file: File) {
-    const anchor = document.createElement("a")
-    anchor.href = URL.createObjectURL(file)
-    document.body.appendChild(anchor)
-    anchor.click()
-    document.body.removeChild(anchor)
+    return (
+        <div className="col p-3">
+            <div className="row mb-6">
+                <TextInput
+                    label={"Title"}
+                    value={props.title}
+                />
+            </div>
+            <div className="row mb-6">
+                <TextArea
+                    label={"Description"}
+                    value={props.description}
+                    rows={15}
+                />
+            </div>
+            <div className="row mb-6">
+                <TextInput
+                    label={"CVE"}
+                    value={props.cve ?? ""}
+                />
+            </div>
+            <div className="row mb-6 py-3">
+                {file != null
+                    ? <Button
+                        onClick={() => file && downloadFile(file)}
+                        text={"Click to download attached file"}
+                    />
+                    : null
+                }
+            </div>
+        </div>
+    )
 }
+
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+function noop() {}
