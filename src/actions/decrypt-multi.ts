@@ -1,6 +1,5 @@
 import {timelockDecrypt} from "tlock-js"
 import {vulnerabilityDecryptionSchema} from "../schema/vulnerability-encryption-schema"
-import {fileExtension} from "./file-utils"
 
 type TextContent = { type: "text", value: string }
 type VulnerabilityReportContent = {
@@ -22,9 +21,8 @@ export async function decryptMulti(ciphertext: string): Promise<DecryptionConten
 
         let file: File | undefined = undefined
         if (vulnReport.file) {
-            const fileBuffer = Buffer.from(vulnReport.file, "base64")
-            const extension = fileExtension(fileBuffer)
-            file = new File([fileBuffer], `decrypted_vulnerability_report${extension}`)
+            const fileBuffer = Buffer.from(vulnReport.file.content, "base64")
+            file = new File([fileBuffer], vulnReport.file.name)
         }
 
         return {
