@@ -3,7 +3,7 @@ import React, {useEffect, useState} from "preact/compat"
 import {defaultClientInfo, timeForRound} from "tlock-js"
 import {TextArea} from "../components/TextArea"
 import {DecryptionContent, decryptMulti} from "../actions/decrypt-multi"
-import {errorMessage} from "../actions/errors"
+import {errorMessage, localisedDecryptionMessageOrDefault} from "../actions/errors"
 import {Button} from "../components/Button"
 import {TextInput} from "../components/TextInput"
 import {downloadFile} from "../actions/file-utils"
@@ -24,18 +24,7 @@ export const MultiDecrypt = () => {
             .then(() => setIsLoading(false))
             .catch(err => {
                 console.error(err)
-
-                // this is quite a brittle way to display decryption time
-                const message = errorMessage(err)
-                const tooEarlyToDecryptErrorMessage = "It's too early to decrypt! Can only be decrypted after round "
-                if (message.startsWith(tooEarlyToDecryptErrorMessage)) {
-                    const roundNumber = Number.parseInt(message.split(tooEarlyToDecryptErrorMessage)[1])
-                    const timeToDecryption = new Date(timeForRound(roundNumber, defaultClientInfo))
-                    setError(`This message cannot be decrypted until ${timeToDecryption.toLocaleDateString()} at ${timeToDecryption.toLocaleTimeString()}`)
-                } else {
-                    setError("There was an error during decryption! Is your ciphertext valid?")
-                }
-
+                setError(localisedDecryptionMessageOrDefault(err))
                 setIsLoading(false)
             })
     }, [ciphertext])

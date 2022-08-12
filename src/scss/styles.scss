@@ -43,6 +43,8 @@ input, textarea {
   text-align: center;
 }
 
+// this is default in bootstrap and looks bizarre particularly on mobile
+// the right edge just ends up with some random padding o.O
 .row, .container-xxl {
   --bs-gutter-x: 0em;
 }

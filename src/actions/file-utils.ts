@@ -30,22 +30,22 @@ function isZip(buf: Buffer): boolean {
 }
 
 function isTar(buf: Buffer): boolean {
-    const readSum = Number.parseInt(buf.toString("utf8", 148, 154).replace(/\\0.*$/, '').trim(), 8)
+    const readSum = Number.parseInt(buf.toString("utf8", 148, 154).replace(/\\0.*$/, "").trim(), 8)
     if (Number.isNaN(readSum)) {
         return false
     }
 
-    let sum = 8 * 0x20 // Initialize signed bit sum
+    let signedBitSum = 8 * 0x20
 
     for (let i = 0; i < 148; i++) {
-        sum += buf[i]
+        signedBitSum += buf[i]
     }
 
     for (let i = 156; i < 512; i++) {
-        sum += buf[i]
+        signedBitSum += buf[i]
     }
 
-    return readSum === sum
+    return readSum === signedBitSum
 }
 
 function isGzip(buf: Buffer): boolean {
