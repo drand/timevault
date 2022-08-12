@@ -37,7 +37,7 @@ export const MultiDecrypt = () => {
         <Fragment>
             <div className="row light-bg px-3 py-2 align-items-end">
                 <div className="col p-0" id="errors">
-                    <p className="p-0 my-3">{error}</p>
+                    <p className="p-0 my-0 my-sm-3">{error}</p>
                 </div>
             </div>
 
