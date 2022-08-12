@@ -31,20 +31,20 @@ const TextEncrypt = () => {
 
     return (
         <Fragment>
-            <div class="light-bg row p-3 align-items-end">
-                <div class="col col-md-4 p-0">
+            <div className="row p-0" id="errors">
+                <p className="m-0 p-0" id="error">{error}</p>
+            </div>
+            <div className={"col-sm-6 p-3"}>
+                <div className="row mb-6">
                     <TimeInput
                         label={"Decryption time"}
                         value={decryptionTime}
                         onChange={setDecryptionTime}
                     />
                 </div>
-                <div class="col p-0" id="errors">
-                    <p className="m-0 p-0" id="error">{error}</p>
-                </div>
             </div>
 
-            <div class="row light-bg px-3">
+            <div class="row light-bg p-0">
                 <div class="col-12 col-lg-6 p-3">
                     <div className="row mb-6">
                         <TextArea

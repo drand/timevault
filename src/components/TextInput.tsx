@@ -8,7 +8,7 @@ type TextInputProps = {
     disabled?: boolean
 }
 export const TextInput = (props: TextInputProps) =>
-    <label className="form-label p-lg-0">
+    <label className="form-label p-0">
         {props.label}
 
         <input

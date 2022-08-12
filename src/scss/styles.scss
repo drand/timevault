@@ -42,3 +42,11 @@ input, textarea {
   color: $warning-color;
   text-align: center;
 }
+
+.row, .container-xxl {
+  --bs-gutter-x: 0em;
+}
+
+.opening-text {
+  padding: 1em;
+}

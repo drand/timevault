@@ -17,7 +17,7 @@ const defaultProps = {
 export const TextArea = (props: TextAreaProps) =>
     <label
         htmlFor={props.label}
-        className="form-label p-lg-0"
+        className="form-label p-0"
     >
         {props.label}
         <textarea

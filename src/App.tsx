@@ -2,7 +2,7 @@ import React from "preact/compat"
 import {h} from "preact"
 import {Tab, TabView} from "./components/TabView"
 import {TextEncrypt} from "./views/TextEncrypt"
-import {VulnerabilityReport} from "./views/VulnerabilityReport"
+import {VulnerabilityReportEncrypt} from "./views/VulnerabilityReportEncrypt"
 import {MultiDecrypt} from "./views/MultiDecrypt"
 
 const App = () =>
@@ -11,7 +11,7 @@ const App = () =>
             <TextEncrypt/>
         </Tab>
         <Tab title={"Vulnerability report"}>
-            <VulnerabilityReport/>
+            <VulnerabilityReportEncrypt/>
         </Tab>
         <Tab title={"Decrypt"}>
             <MultiDecrypt/>

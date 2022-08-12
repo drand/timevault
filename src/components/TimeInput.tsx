@@ -1,3 +1,4 @@
+import React from "preact/compat"
 import {h} from "preact"
 
 type TimeInputProps = {
@@ -6,7 +7,7 @@ type TimeInputProps = {
     onChange: (time: number) => void
 }
 export const TimeInput = (props: TimeInputProps) =>
-    <label htmlFor="time" className="form-label p-lg-0">{props.label}
+    <label htmlFor="time" className="form-label p-0">{props.label}
         <input
             className="form-control"
             value={formatDate(new Date(props.value))}

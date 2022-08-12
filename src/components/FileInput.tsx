@@ -7,7 +7,7 @@ type FileInputProps = {
 }
 
 export const FileInput = (props: FileInputProps) =>
-    <label className="form-label p-lg-0">
+    <label className="form-label p-0">
         {props.label}
 
         <input

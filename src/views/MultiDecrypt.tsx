@@ -1,12 +1,12 @@
 import {Fragment, h} from "preact"
 import React, {useEffect, useState} from "preact/compat"
+import {defaultClientInfo, timeForRound} from "tlock-js"
 import {TextArea} from "../components/TextArea"
 import {DecryptionContent, decryptMulti} from "../actions/decrypt-multi"
 import {errorMessage} from "../actions/errors"
 import {Button} from "../components/Button"
 import {TextInput} from "../components/TextInput"
 import {downloadFile} from "../actions/file-utils"
-import {defaultClientInfo, timeForRound} from "tlock-js"
 
 export const MultiDecrypt = () => {
     const [ciphertext, setCiphertext] = useState("")
@@ -63,6 +63,7 @@ export const MultiDecrypt = () => {
                         <DecryptedContentView
                             content={content}
                             isLoading={isLoading}
+                            isError={!!error && error !== ""}
                         />
                     </div>
                 </div>
@@ -74,6 +75,7 @@ export const MultiDecrypt = () => {
 
 type DecryptedContentViewProps = {
     isLoading: boolean
+    isError: boolean
     content?: DecryptionContent
 }
 const DecryptedContentView = (props: DecryptedContentViewProps) => {
@@ -84,6 +86,11 @@ const DecryptedContentView = (props: DecryptedContentViewProps) => {
             </div>
         )
     }
+
+    if (props.isError) {
+        return <div className={"row"}></div>
+    }
+
     const content = props.content
     if (!content) {
         return (
