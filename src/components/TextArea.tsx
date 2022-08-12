@@ -10,7 +10,7 @@ type TextAreaProps = {
 }
 
 const defaultProps = {
-    rows: 25,
+    rows: 26,
     cols: 3
 }
 
