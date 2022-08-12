@@ -88,7 +88,7 @@ const DecryptedContentView = (props: DecryptedContentViewProps) => {
     if (!content) {
         return (
             <div className={"row text-center"}>
-                <p><br/>This will load once you enter a ciphertext...</p>
+                <p><br/>Your plaintext will load here once you enter a ciphertext...</p>
             </div>
         )
     }

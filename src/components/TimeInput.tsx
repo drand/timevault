@@ -7,7 +7,7 @@ type TimeInputProps = {
     onChange: (time: number) => void
 }
 export const TimeInput = (props: TimeInputProps) =>
-    <label htmlFor="time" className="form-label p-0">{props.label}
+    <label className="form-label p-0">{props.label}
         <input
             className="form-control"
             value={formatDate(new Date(props.value))}

@@ -14,16 +14,13 @@ html, body {
   color: $highlight-color;
 }
 
+a {
+  text-decoration: none;
+}
+
 input, textarea {
   background-color: $input-color !important;
   color: $highlight-color !important;
-}
-
-input[type="date"] {
-  display: block;
-  -webkit-appearance: textfield;
-  -moz-appearance: textfield;
-  min-height: 1.2em;
 }
 
 .light-bg {
