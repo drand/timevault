@@ -1,7 +1,7 @@
 import {describe} from "mocha"
 import {assert, expect} from "chai"
 import {encryptVulnerabilityReport} from "../../src/actions/encrypt-vulnerability-report"
-import {decryptMulti, VulnerabilityReportContent} from "../../src/actions/decrypt-multi"
+import {decryptMulti} from "../../src/actions/decrypt-multi"
 import {encryptedOrDecryptedFormData} from "../../src/actions/encrypt-text"
 
 import "isomorphic-fetch"
@@ -23,7 +23,7 @@ describe("multi-decryption", () => {
         expect(result.value.description).to.equal(report.description)
         expect(result.value.cve).to.equal(report.cve)
         expect(result.value.file).to.equal(undefined)
-    })
+    }).timeout(5000)
 
     it("identifies non-vulnerability reports as text", async () => {
         const encryptionForm = {
@@ -39,5 +39,5 @@ describe("multi-decryption", () => {
 
         expect(result.type).to.equal("text")
         expect(result.value).to.equal(encryptionForm.plaintext)
-    })
+    }).timeout(5000)
 })
