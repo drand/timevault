@@ -2,7 +2,7 @@ import {timelockDecrypt} from "tlock-js"
 import {vulnerabilityDecryptionSchema} from "../schema/vulnerability-encryption-schema"
 
 type TextContent = { type: "text", value: string }
-export type VulnerabilityReportContent = {
+type VulnerabilityReportContent = {
     type: "vulnerability_report",
     value: {
         title: string,
