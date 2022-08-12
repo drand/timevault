@@ -42,13 +42,13 @@ export const MultiDecrypt = () => {
 
     return (
         <Fragment>
-            <div className="light-bg row p-3 align-items-end">
+            <div className="row light-bg px-3 py-2 align-items-end">
                 <div className="col p-0" id="errors">
                     <p className="m-0 p-0" id="error">{error}</p>
                 </div>
             </div>
 
-            <div className="row light-bg px-3">
+            <div className="row light-bg">
                 <div className="col-12 col-lg-6 px-3">
                     <div className="row mb-6">
                         <TextArea
@@ -106,15 +106,6 @@ const DecryptedContentView = (props: DecryptedContentViewProps) => {
                 label={"Plaintext"}
                 value={content.value}
                 onChange={noop}
-            />
-        )
-    }
-
-    if (content.type === "file") {
-        return (
-            <Button
-                onClick={() => downloadFile(content.value)}
-                text={"Click to download decrypted file"}
             />
         )
     }
