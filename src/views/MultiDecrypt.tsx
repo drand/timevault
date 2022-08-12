@@ -40,7 +40,6 @@ export const MultiDecrypt = () => {
             })
     }, [ciphertext])
 
-
     return (
         <Fragment>
             <div className="light-bg row p-3 align-items-end">
@@ -88,8 +87,8 @@ const DecryptedContentView = (props: DecryptedContentViewProps) => {
     const content = props.content
     if (!content) {
         return (
-            <div className={"row justify-content-center"}>
-                <p className={"text-align-center"}><br/>This will load once you enter a ciphertext...</p>
+            <div className={"row text-center"}>
+                <p><br/>This will load once you enter a ciphertext...</p>
             </div>
         )
     }
