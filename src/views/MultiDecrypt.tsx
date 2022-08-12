@@ -1,9 +1,8 @@
 import {Fragment, h} from "preact"
 import React, {useEffect, useState} from "preact/compat"
-import {defaultClientInfo, timeForRound} from "tlock-js"
 import {TextArea} from "../components/TextArea"
 import {DecryptionContent, decryptMulti} from "../actions/decrypt-multi"
-import {errorMessage, localisedDecryptionMessageOrDefault} from "../actions/errors"
+import {localisedDecryptionMessageOrDefault} from "../actions/errors"
 import {Button} from "../components/Button"
 import {TextInput} from "../components/TextInput"
 import {downloadFile} from "../actions/file-utils"
@@ -19,21 +18,26 @@ export const MultiDecrypt = () => {
             return
         }
         setIsLoading(true)
+
         decryptMulti(ciphertext)
             .then(c => setContent(c))
-            .then(() => setIsLoading(false))
             .catch(err => {
                 console.error(err)
                 setError(localisedDecryptionMessageOrDefault(err))
-                setIsLoading(false)
             })
+            // this seems insane, because it is.
+            // calling `setLoading` back to the same value (ie. false) within a single promise causes NONE of the setState calls to be rendered
+            // probably because of some fancy prop checking in preact
+            // setting timeout seems to work around
+            .finally(() => setTimeout(() => setIsLoading(false), 100))
+
     }, [ciphertext])
 
     return (
         <Fragment>
             <div className="row light-bg px-3 py-2 align-items-end">
                 <div className="col p-0" id="errors">
-                    <p className="m-0 p-0" id="error">{error}</p>
+                    <p className="p-0">{error}</p>
                 </div>
             </div>
 
@@ -52,7 +56,7 @@ export const MultiDecrypt = () => {
                         <DecryptedContentView
                             content={content}
                             isLoading={isLoading}
-                            isError={!!error && error !== ""}
+                            error={error}
                         />
                     </div>
                 </div>
@@ -64,7 +68,7 @@ export const MultiDecrypt = () => {
 
 type DecryptedContentViewProps = {
     isLoading: boolean
-    isError: boolean
+    error: string
     content?: DecryptionContent
 }
 const DecryptedContentView = (props: DecryptedContentViewProps) => {
@@ -76,7 +80,7 @@ const DecryptedContentView = (props: DecryptedContentViewProps) => {
         )
     }
 
-    if (props.isError) {
+    if (props.error !== "") {
         return <div className={"row"}></div>
     }
 
