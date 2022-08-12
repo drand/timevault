@@ -6,6 +6,7 @@ import {errorMessage} from "../actions/errors"
 import {Button} from "../components/Button"
 import {TextInput} from "../components/TextInput"
 import {downloadFile} from "../actions/file-utils"
+import {defaultClientInfo, timeForRound} from "tlock-js"
 
 export const MultiDecrypt = () => {
     const [ciphertext, setCiphertext] = useState("")
@@ -23,7 +24,18 @@ export const MultiDecrypt = () => {
             .then(() => setIsLoading(false))
             .catch(err => {
                 console.error(err)
-                setError("There was an error during decryption! Is your ciphertext valid?")
+
+                // this is quite a brittle way to display decryption time
+                const message = errorMessage(err)
+                const tooEarlyToDecryptErrorMessage = "It's too early to decrypt! Can only be decrypted after round "
+                if (message.startsWith(tooEarlyToDecryptErrorMessage)) {
+                    const roundNumber = Number.parseInt(message.split(tooEarlyToDecryptErrorMessage)[1])
+                    const timeToDecryption = new Date(timeForRound(roundNumber, defaultClientInfo))
+                    setError(`This message cannot be decrypted until ${timeToDecryption.toLocaleDateString()} at ${timeToDecryption.toLocaleTimeString()}`)
+                } else {
+                    setError("There was an error during decryption! Is your ciphertext valid?")
+                }
+
                 setIsLoading(false)
             })
     }, [ciphertext])
@@ -152,4 +164,5 @@ const VulnerabilityReport = (props: VulnerabilityReportProps) => {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
-function noop() {}
+function noop() {
+}
