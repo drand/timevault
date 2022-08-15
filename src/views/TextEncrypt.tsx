@@ -27,7 +27,7 @@ const TextEncrypt = () => {
                 console.error(err)
                 setError(errorMessage(err))
             })
-    }, [plaintext])
+    }, [plaintext, decryptionTime])
 
     return (
         <Fragment>
