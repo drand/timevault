@@ -15,13 +15,9 @@ const defaultProps = {
 }
 
 export const TextArea = (props: TextAreaProps) =>
-    <label
-        htmlFor={props.label}
-        className="form-label p-0"
-    >
+    <label className="form-label p-0">
         {props.label}
         <textarea
-            id={props.label}
             className="form-control"
             cols={props.cols ?? defaultProps.cols}
             rows={props.rows ?? defaultProps.rows}
