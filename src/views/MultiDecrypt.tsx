@@ -29,16 +29,16 @@ export const MultiDecrypt = () => {
 
         // for some reason all the state updates don't happen without `setTimeout`
         const ongoingDecryption = setTimeout(() => decryptMulti(ciphertext)
-                .then(c => setContent(c))
-                .catch(err => {
-                    console.error(err)
-                    setError(localisedDecryptionMessageOrDefault(err))
-                })
-                .finally(() => {
-                    setIsLoading(false)
-                    setDirtyForm(false)
-                }),
-            0)
+            .then(c => setContent(c))
+            .catch(err => {
+                console.error(err)
+                setError(localisedDecryptionMessageOrDefault(err))
+            })
+            .finally(() => {
+                setIsLoading(false)
+                setDirtyForm(false)
+            })
+        )
 
         return () => clearTimeout(ongoingDecryption)
     }, [ciphertext, dirtyForm])
