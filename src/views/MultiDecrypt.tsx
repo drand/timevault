@@ -10,7 +10,7 @@ import {downloadFile} from "../actions/file-utils"
 export const MultiDecrypt = () => {
     const [ciphertext, setCiphertext] = useState("")
     const [content, setContent] = useState<DecryptionContent>()
-    const [error, setError] = useState(() => "")
+    const [error, setError] = useState("")
     const [isLoading, setIsLoading] = useState(false)
     const [dirtyForm, setDirtyForm] = useState(false)
 
@@ -28,7 +28,7 @@ export const MultiDecrypt = () => {
         setIsLoading(true)
 
         // for some reason all the state updates don't happen without `setTimeout`
-        setTimeout(() => decryptMulti(ciphertext)
+        const ongoingDecryption = setTimeout(() => decryptMulti(ciphertext)
                 .then(c => setContent(c))
                 .catch(err => {
                     console.error(err)
@@ -39,6 +39,8 @@ export const MultiDecrypt = () => {
                     setDirtyForm(false)
                 }),
             0)
+
+        return () => clearTimeout(ongoingDecryption)
     }, [ciphertext, dirtyForm])
 
     return (
