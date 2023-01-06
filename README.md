@@ -16,7 +16,7 @@ Automagically deploys to https://timevault.drand.love
 ## Caveats
 
 This is currently running against the drand testnet.  The availability, continuity and security guarantees on the testnet are weak.  
-In September 2022, we will be deploying [unchained randomness](https://drand.love/docs/cryptography/#randomness) to mainnet which will enable timelock encryption there and provide much better guarantees.
+In February 2023, we will be deploying [unchained randomness](https://drand.love/docs/cryptography/#randomness) to mainnet which will enable timelock encryption there and provide much better guarantees.
 
 ## License
 
