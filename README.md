@@ -18,6 +18,9 @@ Automagically deploys to https://timevault.drand.love
 This is currently running against the drand testnet.  The availability, continuity and security guarantees on the testnet are weak.  
 In February 2023, we will be deploying [unchained randomness](https://drand.love/docs/cryptography/#randomness) to mainnet which will enable timelock encryption there and provide much better guarantees.
 
+## Deployment
+The app is currently deployed on cloudflare, though running the `build:githubpages` npm script to build it. Github Actions did not allow setting some useful security headers out-of-the-box.
+
 ## License
 
 This project is licensed using the [Permissive License Stack](https://protocol.ai/blog/announcing-the-permissive-license-stack/) which means that all contributions are available under the most permissive commonly-used licenses, and dependent projects can pick the license that best suits them.
