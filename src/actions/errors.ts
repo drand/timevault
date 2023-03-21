@@ -1,4 +1,5 @@
-import {defaultClientInfo, timeForRound} from "tlock-js"
+import {roundTime} from "tlock-js"
+import {MAINNET_CHAIN_INFO} from "tlock-js/drand/defaults"
 
 export function errorMessage(err: unknown): string {
     if (err instanceof Error) {
@@ -23,6 +24,6 @@ export function localisedDecryptionMessageOrDefault(err: unknown): string {
     }
 
     const roundNumber = Number.parseInt(message.split(tooEarlyToDecryptErrorMessage)[1])
-    const timeToDecryption = new Date(timeForRound(roundNumber, defaultClientInfo))
+    const timeToDecryption = new Date(roundTime(MAINNET_CHAIN_INFO, roundNumber))
     return `This message cannot be decrypted until ${timeToDecryption.toLocaleDateString()} at ${timeToDecryption.toLocaleTimeString()}`
 }
