@@ -16,7 +16,7 @@ Automagically deploys to https://timevault.drand.love
 ## Network
 
 This is currently running against the drand mainnet. 
-Ciphertexts from prior to 21st of March 2023 were using testnet, and as such you may need to replace instances of `mainnetClient()` with `testnetClient()` in the code for it to decrypt them.
+Ciphertexts from prior to 22st of March 2023 were using testnet, and as such you may need to replace instances of `mainnetClient()` with `testnetClient()` in the code for it to decrypt them.
 
 ## License
 
