@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="content-security-policy" content="script-src 'self' frame-ancestors 'none'" />
+    <meta http-equiv="content-security-policy" content="script-src 'self' frame-ancestors 'none'"/>
     <title>Timevault</title>
     <link rel="stylesheet" href="scss/styles.scss">
     <link rel="icon" type="image/svg+xml" href="./images/tlock-icon.svg" sizes="any">
@@ -17,13 +17,32 @@
                 href="https://github.com/drand/tlock-js" target="_blank">tlock-js</a></h5>
         <p>Read the source code on <a href="https://github.com/drand/timevault" target="_blank">Github</a>.</p>
         <p>Read the pre-print paper on <a href="https://eprint.iacr.org/2023/189" target="_blank">ePrint</a>.</p>
-        <p>Or watch our Research Seminar on <a href="https://www.youtube.com/watch?v=Zgsv4LY0Sn0" target="_blank">YouTube</a>.</p>
+        <p>Or watch our Research Seminar on <a href="https://www.youtube.com/watch?v=Zgsv4LY0Sn0" target="_blank">YouTube</a>.
+        </p>
+        <p>
+            This is currently running against the drand mainnet.<br/>
+            Ciphertexts from prior to 22st of March 2023 were encrypted using testnet and can be decrypted using a prior
+            version of the <a href="https://github.com/drand/tlock">go CLI tool</a>.
+        </p>
+
         <p>To encrypt, choose from text or vulnerability report below and fill in the required fields<br/>
             To decrypt, choose decrypt and paste in your ciphertext</p>
-        <p>Caveat emptor: this is running against the drand testnet and may contain bugs!</p>
     </div>
 
     <div id="root"></div>
+    <div>
+        <h2>Get in touch</h2>
+        <p>
+        <ul>
+            <li><a href="https://join.slack.com/t/drandworkspace/shared_invite/zt-19u4rf6if-bf7lxIvF2zYn4~TrBwfkiA">Join
+                the drand Slack</a> to discuss Timelock, randomness beacons and more.
+            <li>Follow the <a href="https://drand.love/blog/">drand blog</a> for our articles.</li>
+            <li>Follow the <a href="https://twitter.com/drand_loe">@drand_loe</a> account on Twitter to get regular
+                updates.
+            </li>
+        </ul>
+        </p>
+    </div>
 
     <script src="./index.tsx" type="module"></script>
 </div>

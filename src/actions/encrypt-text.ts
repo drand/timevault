@@ -1,5 +1,6 @@
 import * as yup from "yup"
-import {defaultClientInfo, roundForTime, timelockDecrypt, timelockEncrypt} from "tlock-js"
+import {mainnetClient, roundAt, timelockDecrypt, timelockEncrypt} from "tlock-js"
+import {MAINNET_CHAIN_INFO} from "tlock-js/drand/defaults"
 import {textEncryptionSchema} from "../schema/text-encryption-schema"
 
 export type CompletedWebForm = yup.InferType<typeof textEncryptionSchema>
@@ -18,8 +19,8 @@ export async function encryptedOrDecryptedFormData(form: unknown): Promise<Compl
 }
 
 async function encrypt(plaintext: string, decryptionTime: number): Promise<CompletedWebForm> {
-    const roundNumber = roundForTime(decryptionTime, defaultClientInfo)
-    const ciphertext = await timelockEncrypt(roundNumber, Buffer.from(plaintext))
+    const roundNumber = roundAt(decryptionTime, MAINNET_CHAIN_INFO)
+    const ciphertext = await timelockEncrypt(roundNumber, Buffer.from(plaintext), mainnetClient())
     return {
         plaintext,
         decryptionTime,
@@ -28,7 +29,7 @@ async function encrypt(plaintext: string, decryptionTime: number): Promise<Compl
 }
 
 async function decrypt(ciphertext: string, decryptionTime: number): Promise<CompletedWebForm> {
-    const plaintext = await timelockDecrypt(ciphertext)
+    const plaintext = await timelockDecrypt(ciphertext, mainnetClient())
     return {
         plaintext,
         decryptionTime,

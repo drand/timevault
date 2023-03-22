@@ -13,10 +13,10 @@ Automagically deploys to https://timevault.drand.love
 - run `npm install` to install all the dependencies
 - run `npm start` to run an HTTP server locally serving the UI for encrypting/decrypting your important material
 
-## Caveats
+## Network
 
-This is currently running against the drand testnet.  The availability, continuity and security guarantees on the testnet are weak.  
-In February 2023, we will be deploying [unchained randomness](https://drand.love/docs/cryptography/#randomness) to mainnet which will enable timelock encryption there and provide much better guarantees.
+This is currently running against the drand mainnet. 
+Ciphertexts from prior to 22st of March 2023 were using testnet, and as such you may need to replace instances of `mainnetClient()` with `testnetClient()` in the code for it to decrypt them.
 
 ## Deployment
 The app is currently deployed on cloudflare, though running the `build:githubpages` npm script to build it. Github Actions did not allow setting some useful security headers out-of-the-box.

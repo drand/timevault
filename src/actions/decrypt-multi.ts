@@ -1,4 +1,4 @@
-import {timelockDecrypt} from "tlock-js"
+import {mainnetClient, timelockDecrypt} from "tlock-js"
 import {vulnerabilityDecryptionSchema} from "../schema/vulnerability-encryption-schema"
 
 type TextContent = { type: "text", value: string }
@@ -14,7 +14,7 @@ type VulnerabilityReportContent = {
 export type DecryptionContent = TextContent | VulnerabilityReportContent
 
 export async function decryptMulti(ciphertext: string): Promise<DecryptionContent> {
-    const plaintext = await timelockDecrypt(ciphertext)
+    const plaintext = await timelockDecrypt(ciphertext, mainnetClient())
 
     if (await vulnerabilityDecryptionSchema.isValid(plaintext)) {
         const vulnReport = await vulnerabilityDecryptionSchema.validate(plaintext)
