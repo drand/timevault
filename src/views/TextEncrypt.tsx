@@ -5,9 +5,10 @@ import {createDebouncer} from "../actions/debounce"
 import {TextArea} from "../components/TextArea"
 import {TimeInput} from "../components/TimeInput"
 import {errorMessage} from "../actions/errors"
+import {Network} from "../App"
 
 type TextEncryptProps = {
-    network: "mainnet" | "testnet"
+    network: Network
 }
 const TextEncrypt = (props: TextEncryptProps) => {
     const [plaintext, setPlaintext] = useState("")

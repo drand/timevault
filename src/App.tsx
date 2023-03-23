@@ -35,7 +35,7 @@ const App = () => {
                     <VulnerabilityReportEncrypt network={networkURL}/>
                 </Tab>
                 <Tab title={"Decrypt"}>
-                    <MultiDecrypt networkURL={networkURL}/>
+                    <MultiDecrypt network={networkURL}/>
                 </Tab>
             </TabView>
         </div>
