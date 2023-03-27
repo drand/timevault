@@ -14,8 +14,8 @@ describe("multi-decryption", () => {
             cve: "1234",
             decryptionTime: Date.now()
         }
-        const encryptedVulnerabilityReport = await encryptVulnerabilityReport(report)
-        const result = await decryptMulti(encryptedVulnerabilityReport)
+        const encryptedVulnerabilityReport = await encryptVulnerabilityReport("testnet", report)
+        const result = await decryptMulti("testnet", encryptedVulnerabilityReport)
 
         expect(result.type).to.equal("vulnerability_report")
         assert(result.type === "vulnerability_report")
@@ -30,12 +30,12 @@ describe("multi-decryption", () => {
             plaintext: "blah",
             decryptionTime: Date.now()
         }
-        const {ciphertext} = await encryptedOrDecryptedFormData(encryptionForm)
+        const {ciphertext} = await encryptedOrDecryptedFormData("testnet", encryptionForm)
         if (!ciphertext) {
             throw Error("Expected a ciphertext!")
         }
 
-        const result = await decryptMulti(ciphertext)
+        const result = await decryptMulti("testnet", ciphertext)
 
         expect(result.type).to.equal("text")
         expect(result.value).to.equal(encryptionForm.plaintext)

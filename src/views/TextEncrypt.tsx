@@ -5,8 +5,12 @@ import {createDebouncer} from "../actions/debounce"
 import {TextArea} from "../components/TextArea"
 import {TimeInput} from "../components/TimeInput"
 import {errorMessage} from "../actions/errors"
+import {Network} from "../App"
 
-const TextEncrypt = () => {
+type TextEncryptProps = {
+    network: Network
+}
+const TextEncrypt = (props: TextEncryptProps) => {
     const [plaintext, setPlaintext] = useState("")
     const [ciphertext, setCiphertext] = useState("")
     const [decryptionTime, setDecryptionTime] = useState(Date.now())
@@ -18,7 +22,7 @@ const TextEncrypt = () => {
             return
         }
 
-        debounced(() => encryptedOrDecryptedFormData({plaintext, ciphertext, decryptionTime}))
+        debounced(() => encryptedOrDecryptedFormData(props.network, {plaintext, ciphertext, decryptionTime}))
             .then(output => {
                 setCiphertext(output.ciphertext ?? "")
                 setDecryptionTime(output.decryptionTime)
@@ -27,7 +31,7 @@ const TextEncrypt = () => {
                 console.error(err)
                 setError(errorMessage(err))
             })
-    }, [plaintext, decryptionTime])
+    }, [plaintext, decryptionTime, props.network])
 
     return (
         <Fragment>

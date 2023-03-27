@@ -6,8 +6,12 @@ import {localisedDecryptionMessageOrDefault} from "../actions/errors"
 import {Button} from "../components/Button"
 import {TextInput} from "../components/TextInput"
 import {downloadFile} from "../actions/file-utils"
+import {Network} from "../App"
 
-export const MultiDecrypt = () => {
+type MultiDecryptProps = {
+    network: Network
+}
+export const MultiDecrypt = (props: MultiDecryptProps) => {
     const [ciphertext, setCiphertext] = useState("")
     const [content, setContent] = useState<DecryptionContent>()
     const [error, setError] = useState("")
@@ -28,7 +32,7 @@ export const MultiDecrypt = () => {
         setIsLoading(true)
 
         // for some reason all the state updates don't happen without `setTimeout`
-        const ongoingDecryption = setTimeout(() => decryptMulti(ciphertext)
+        const ongoingDecryption = setTimeout(() => decryptMulti(props.network, ciphertext)
             .then(c => setContent(c))
             .catch(err => {
                 console.error(err)
