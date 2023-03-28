@@ -17,7 +17,7 @@ export function errorMessage(err: unknown): string {
 // otherwise it just returns a generic error message, as some of the internal tlock error messages are a bit inscrutable to the end user
 export function localisedDecryptionMessageOrDefault(err: unknown): string {
     const message = errorMessage(err)
-    const tooEarlyToDecryptErrorMessage = "It's too early to decrypt the ciphertext"
+    const tooEarlyToDecryptErrorMessage = "It's too early to decrypt the ciphertext - decryptable at round "
 
     if (!message.startsWith(tooEarlyToDecryptErrorMessage)) {
         return "There was an error during decryption! Is your ciphertext valid?"
