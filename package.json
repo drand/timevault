@@ -36,7 +36,7 @@
   "dependencies": {
     "bootstrap": "^5.2.0",
     "preact": "^10.10.1",
-    "tlock-js": "^0.4.0",
+    "tlock-js": "^0.5.0",
     "yup": "^0.32.11"
   },
   "browserslist": [
