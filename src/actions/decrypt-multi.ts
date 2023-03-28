@@ -1,4 +1,4 @@
-import {HttpChainClient, mainnetClient, testnetClient, timelockDecrypt} from "tlock-js"
+import {HttpChainClient, timelockDecrypt} from "tlock-js"
 import {vulnerabilityDecryptionSchema} from "../schema/vulnerability-encryption-schema"
 import {Network} from "../App"
 import {mainnet, testnet} from "./client-utils"

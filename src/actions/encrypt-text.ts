@@ -1,5 +1,5 @@
 import * as yup from "yup"
-import {HttpChainClient, mainnetClient, roundAt, testnetClient, timelockDecrypt, timelockEncrypt} from "tlock-js"
+import {HttpChainClient, roundAt, timelockDecrypt, timelockEncrypt} from "tlock-js"
 import {textEncryptionSchema} from "../schema/text-encryption-schema"
 import {Network} from "../App"
 import {mainnet, testnet} from "./client-utils"

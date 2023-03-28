@@ -1,4 +1,4 @@
-import {HttpCachingChain, HttpChainClient, mainnetClient} from "tlock-js"
+import {HttpCachingChain, HttpChainClient} from "tlock-js"
 import {MAINNET_CHAIN_URL, TESTNET_CHAIN_URL} from "tlock-js/drand/defaults"
 
 export function mainnet(): HttpChainClient {
