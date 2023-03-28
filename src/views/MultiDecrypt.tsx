@@ -45,7 +45,7 @@ export const MultiDecrypt = (props: MultiDecryptProps) => {
         )
 
         return () => clearTimeout(ongoingDecryption)
-    }, [ciphertext, dirtyForm])
+    }, [ciphertext, dirtyForm, props.network])
 
     return (
         <Fragment>

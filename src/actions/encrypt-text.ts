@@ -1,7 +1,8 @@
 import * as yup from "yup"
-import {HttpChainClient, mainnetClient, roundAt, testnetClient, timelockDecrypt, timelockEncrypt} from "tlock-js"
+import {HttpChainClient, roundAt, timelockDecrypt, timelockEncrypt} from "tlock-js"
 import {textEncryptionSchema} from "../schema/text-encryption-schema"
 import {Network} from "../App"
+import {mainnet, testnet} from "./client-utils"
 
 export type CompletedWebForm = yup.InferType<typeof textEncryptionSchema>
 
@@ -9,9 +10,9 @@ export async function encryptedOrDecryptedFormData(network: Network, form: unkno
     const partialWebForm = await textEncryptionSchema.validate(form)
     let client: HttpChainClient
     if (network === "mainnet") {
-        client = mainnetClient()
+        client = mainnet()
     } else {
-        client = testnetClient()
+        client = testnet()
     }
 
     if (partialWebForm.plaintext) {
