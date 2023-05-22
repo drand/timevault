@@ -2,9 +2,10 @@ FROM node:18-alpine AS build
 
 WORKDIR /app
 
-COPY . .
+COPY package*.json ./
 
 RUN npm i
+COPY ./src ./src
 RUN npm run build
 
 FROM nginx:stable-alpine
