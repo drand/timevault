@@ -1,0 +1,29 @@
+ steps:
+ # Build the container image
+ - name: 'gcr.io/cloud-builders/docker'
+   args: ['build', '-t', 'gcr.io/$_PROJECT_ID/$_IMAGE_NAME:$COMMIT_SHA', '.']
+ # Push the container image to Container Registry
+ - name: 'gcr.io/cloud-builders/docker'
+   args: ['push', 'gcr.io/$_PROJECT_ID/$_IMAGE_NAME:$COMMIT_SHA']
+ # Deploy container image to Cloud Run
+ - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+   entrypoint: gcloud
+   args:
+   - 'run'
+   - 'deploy'
+   - '$_IMAGE_NAME'
+   - '--platform=managed'
+   - '--image'
+   - 'gcr.io/$_PROJECT_ID/$_IMAGE_NAME:$COMMIT_SHA'
+   - '--region'
+   - '$_REGION'
+   - '--allow-unauthenticated'
+   - '--port'
+   - '80'  
+ images:
+ - 'gcr.io/$_PROJECT_ID/$_IMAGE_NAME:$COMMIT_SHA'
+
+ substitutions:
+   _IMAGE_NAME: timevault
+   _REGION: <YOUR_REGION>
+   _PROJECT_ID: <YOUR_PROJECT_ID>
