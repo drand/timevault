@@ -10,7 +10,7 @@
     "clean": "rm -rf ./dist/*",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
-    "start": "parcel ./src/index.html",
+    "start": "parcel ./src/index.html --public-url /",
     "test": "mocha --require ts-node/register ./test/**/*.test.ts"
   },
   "author": "drand.love",
@@ -36,7 +36,7 @@
   "dependencies": {
     "bootstrap": "^5.2.0",
     "preact": "^10.10.1",
-    "tlock-js": "^0.6.1",
+    "tlock-js": "^0.8.0",
     "yup": "^0.32.11"
   },
   "browserslist": [
