@@ -27,7 +27,20 @@ export function fastnet(): HttpChainClient {
     return new HttpChainClient(new HttpCachingChain(MAINNET_CHAIN_URL_NON_RFC, clientOpts), clientOpts, {})
 }
 
-export function testnet(): HttpChainClient {
+export function testnetQuicknet(): HttpChainClient {
+    const clientOpts = {
+        disableBeaconVerification: false,
+        noCache: false,
+        chainVerificationParams: {
+            chainHash: "cc9c398442737cbd141526600919edd69f1d6f9b4adb67e4d912fbc64341a9a5",
+            publicKey: "b15b65b46fb29104f6a4b5d1e11a8da6344463973d423661bb0804846a0ecd1ef93c25057f1c0baab2ac53e56c662b66072f6d84ee791a3382bfb055afab1e6a375538d8ffc451104ac971d2dc9b168e2d3246b0be2015969cbaac298f6502da"
+        }
+    }
+
+    // passing an empty httpOptions arg to strip the user agent header to stop CORS issues
+    return new HttpChainClient(new HttpCachingChain("https://pl-us.testnet.drand.sh/cc9c398442737cbd141526600919edd69f1d6f9b4adb67e4d912fbc64341a9a5", clientOpts), clientOpts, {})
+}
+export function testnetUnchained(): HttpChainClient {
     const clientOpts = {
         disableBeaconVerification: false,
         noCache: false,

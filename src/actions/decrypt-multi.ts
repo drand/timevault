@@ -1,7 +1,7 @@
 import {HttpChainClient, timelockDecrypt} from "tlock-js"
 import {vulnerabilityDecryptionSchema} from "../schema/vulnerability-encryption-schema"
 import {Network} from "../App"
-import {fastnet, quicknet, testnet} from "./client-utils"
+import {fastnet, quicknet, testnetQuicknet, testnetUnchained} from "./client-utils"
 
 type TextContent = { type: "text", value: string }
 type VulnerabilityReportContent = {
@@ -17,13 +17,22 @@ export type DecryptionContent = TextContent | VulnerabilityReportContent
 
 export async function decryptMulti(network: Network, ciphertext: string): Promise<DecryptionContent> {
     let client: HttpChainClient
-    if (network === "quicknet") {
-        client = quicknet()
-    } else if (network === "fastnet") {
-        client = fastnet()
-    } else {
-        client = testnet()
+    switch (network) {
+        case "quicknet":
+            client = quicknet()
+            break
+        case "fastnet":
+            client = fastnet()
+            break
+        case "quicknet-t":
+            client = testnetQuicknet()
+            break
+        case "testnet-unchained-3s":
+            client = testnetUnchained()
+            break
+        default: throw Error("unknown network")
     }
+
     const plaintext = await timelockDecrypt(ciphertext, client)
 
     if (await vulnerabilityDecryptionSchema.isValid(plaintext)) {
