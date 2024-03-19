@@ -21,7 +21,7 @@ const networks: Array<DropdownItem<Network>> = [
         value: "quicknet-t"
     },
     {
-        label: "Testnet (testnet-unchained-3s - deprecated",
+        label: "Testnet (testnet-unchained-3s - deprecated)",
         value: "testnet-unchained-3s"
     },
 ]

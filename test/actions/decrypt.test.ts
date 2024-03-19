@@ -7,6 +7,7 @@ import {encryptedOrDecryptedFormData} from "../../src/actions/encrypt-text"
 import "isomorphic-fetch"
 
 describe("multi-decryption", () => {
+    const network = "testnet-unchained-3s"
     it("correctly identifies vulnerability reports", async () => {
         const report = {
             title: "something",
@@ -14,8 +15,8 @@ describe("multi-decryption", () => {
             cve: "1234",
             decryptionTime: Date.now()
         }
-        const encryptedVulnerabilityReport = await encryptVulnerabilityReport("testnet-unchained-3s", report)
-        const result = await decryptMulti("testnet-unchained-3s", encryptedVulnerabilityReport)
+        const encryptedVulnerabilityReport = await encryptVulnerabilityReport(network, report)
+        const result = await decryptMulti(network, encryptedVulnerabilityReport)
 
         expect(result.type).to.equal("vulnerability_report")
         assert(result.type === "vulnerability_report")
@@ -30,12 +31,12 @@ describe("multi-decryption", () => {
             plaintext: "blah",
             decryptionTime: Date.now()
         }
-        const {ciphertext} = await encryptedOrDecryptedFormData("testnet-unchained-3s", encryptionForm)
+        const {ciphertext} = await encryptedOrDecryptedFormData(network, encryptionForm)
         if (!ciphertext) {
             throw Error("Expected a ciphertext!")
         }
 
-        const result = await decryptMulti("testnet-unchained-3s", ciphertext)
+        const result = await decryptMulti(network, ciphertext)
 
         expect(result.type).to.equal("text")
         expect(result.value).to.equal(encryptionForm.plaintext)

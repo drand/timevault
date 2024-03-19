@@ -33,7 +33,8 @@ export async function decryptMulti(network: Network, ciphertext: string): Promis
         default: throw Error("unknown network")
     }
 
-    const plaintext = await timelockDecrypt(ciphertext, client)
+    const buf = await timelockDecrypt(ciphertext, client)
+    const plaintext = buf.toString()
 
     if (await vulnerabilityDecryptionSchema.isValid(plaintext)) {
         const vulnReport = await vulnerabilityDecryptionSchema.validate(plaintext)
