@@ -6,15 +6,23 @@ import {VulnerabilityReportEncrypt} from "./views/VulnerabilityReportEncrypt"
 import {MultiDecrypt} from "./views/MultiDecrypt"
 import {Dropdown, DropdownItem} from "./components/Dropdown"
 
-export type Network = "mainnet" | "testnet"
+export type Network = "quicknet" | "fastnet" | "testnet-unchained-3s" | "quicknet-t"
 const networks: Array<DropdownItem<Network>> = [
     {
-        label: "Mainnet",
-        value: "mainnet"
+        label: "Mainnet (quicknet)",
+        value: "quicknet"
     },
     {
-        label: "Testnet",
-        value: "testnet"
+        label: "Mainnet (fastnet - deprecated)",
+        value: "fastnet"
+    },
+    {
+        label: "Testnet (quicknet-t)",
+        value: "quicknet-t"
+    },
+    {
+        label: "Testnet (testnet-unchained-3s - deprecated)",
+        value: "testnet-unchained-3s"
     },
 ]
 const App = () => {
