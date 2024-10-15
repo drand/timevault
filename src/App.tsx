@@ -19,11 +19,7 @@ const networks: Array<DropdownItem<Network>> = [
     {
         label: "Testnet (quicknet-t)",
         value: "quicknet-t"
-    },
-    {
-        label: "Testnet (testnet-unchained-3s - deprecated)",
-        value: "testnet-unchained-3s"
-    },
+    }
 ]
 const App = () => {
     // mainnet is the default network
